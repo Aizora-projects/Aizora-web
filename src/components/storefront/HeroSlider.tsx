@@ -58,52 +58,102 @@ export default function HeroSlider({
   return (
     <section className="relative w-full bg-[#FAF7F2] border-b border-border/50 overflow-hidden">
       {/* ========================================================================= */}
-      {/* 1. MOBILE SPECIAL VIEW (< sm): Only when separate mobile banners uploaded */}
+      {/* 1. MOBILE HERO VIEW (< sm): Complete Luxury Layout with Heading & CTA      */}
       {/* ========================================================================= */}
-      {hasCustomMobileBanners && (
-        <div className="sm:hidden flex flex-col w-full">
-          <div className="relative w-full aspect-[4/5] bg-stone-100 overflow-hidden">
-            {activeMobileBanners.map((url, idx) => (
-              <div
-                key={url + idx}
-                className={`absolute inset-0 transition-opacity duration-700 ease-in-out ${
-                  idx === currentMobileIndex ? 'opacity-100 z-10' : 'opacity-0 z-0 pointer-events-none'
-                }`}
-              >
-                <Image
-                  src={url}
-                  alt={`AIZORA Mobile Banner ${idx + 1}`}
-                  fill
-                  className="object-cover object-top"
-                  priority={idx === 0}
-                  sizes="100vw"
-                />
-              </div>
-            ))}
-
-            {activeMobileBanners.length > 1 && (
-              <div className="absolute bottom-3 left-0 right-0 z-20 flex items-center justify-center gap-1.5">
-                {activeMobileBanners.map((_, dotIdx) => (
-                  <button
-                    key={dotIdx}
-                    onClick={() => setCurrentMobileIndex(dotIdx)}
-                    className={`h-1.5 rounded-full transition-all ${
-                      dotIdx === currentMobileIndex ? 'w-5 bg-white' : 'w-1.5 bg-white/50'
-                    }`}
-                    aria-label={`Slide ${dotIdx + 1}`}
-                  />
-                ))}
-              </div>
-            )}
-          </div>
+      <div className="sm:hidden relative w-full min-h-[560px] flex flex-col justify-end overflow-hidden bg-stone-900">
+        {/* Background Image Layer for Mobile */}
+        <div className="absolute inset-0 w-full h-full z-0 overflow-hidden">
+          {activeMobileBanners.map((url, idx) => (
+            <div
+              key={url + idx}
+              className={`absolute inset-0 transition-opacity duration-700 ease-in-out ${
+                idx === currentMobileIndex ? 'opacity-100 z-10' : 'opacity-0 z-0 pointer-events-none'
+              }`}
+            >
+              <Image
+                src={url}
+                alt={`AIZORA Mobile Banner ${idx + 1}`}
+                fill
+                className="object-cover object-top"
+                priority={idx === 0}
+                sizes="100vw"
+              />
+              {/* Top soft vignette */}
+              <div className="absolute inset-x-0 top-0 h-16 bg-gradient-to-b from-black/40 to-transparent z-10 pointer-events-none" />
+              {/* Bottom dark luxury gradient for crisp, 100% readable typography */}
+              <div className="absolute inset-x-0 bottom-0 h-[70%] bg-gradient-to-t from-stone-950/95 via-stone-900/60 via-55% to-transparent z-10 pointer-events-none" />
+            </div>
+          ))}
         </div>
-      )}
+
+        {/* Foreground Content on Mobile: Eyebrows, Titles, Subtitle, and CTA */}
+        <div className="relative z-20 p-6 pb-8 text-center space-y-3 pointer-events-auto">
+          {/* Eyebrow */}
+          <div className="flex items-center justify-center gap-1.5 text-[10px] tracking-[0.24em] uppercase text-[#D2B48C] font-semibold">
+            <span>{eyebrow1}</span>
+            <span>•</span>
+            <span>{eyebrow2}</span>
+          </div>
+
+          {/* Main Title: WEAR YOUR ELEGANCE */}
+          <div className="space-y-0.5">
+            <h1 className="font-heading font-light text-3xl text-white tracking-[0.05em] leading-tight drop-shadow-sm">
+              {title1}
+            </h1>
+            <h1 className="font-heading font-bold text-4xl text-white tracking-[0.06em] leading-none drop-shadow-md">
+              {title2}
+            </h1>
+          </div>
+
+          {/* Description */}
+          {description && (
+            <p className="text-xs text-stone-200/90 font-body max-w-xs mx-auto leading-relaxed drop-shadow-xs">
+              {description}
+            </p>
+          )}
+
+          {/* CTA Button */}
+          <div className="pt-2">
+            <Link
+              href={ctaLink}
+              className="inline-flex items-center justify-center gap-2.5 bg-[#936E50] hover:bg-[#805C3F] active:bg-[#704E33] text-white px-8 py-3.5 text-xs tracking-[0.22em] uppercase font-bold transition-all rounded-[2px] shadow-lg active:scale-98"
+            >
+              <span>{ctaText}</span>
+              <span>→</span>
+            </Link>
+          </div>
+
+          {/* Value Propositions */}
+          <div className="flex items-center justify-center gap-2 pt-1 text-[9px] tracking-[0.2em] uppercase text-stone-300/80 font-medium">
+            <span>TIMELESS</span>
+            <span>|</span>
+            <span>VERSATILE</span>
+            <span>|</span>
+            <span>UNIQUELY YOU</span>
+          </div>
+
+          {/* Slide Indicator Dots (if multiple banners) */}
+          {activeMobileBanners.length > 1 && (
+            <div className="flex items-center justify-center gap-1.5 pt-2">
+              {activeMobileBanners.map((_, dotIdx) => (
+                <button
+                  key={dotIdx}
+                  onClick={() => setCurrentMobileIndex(dotIdx)}
+                  className={`h-1.5 rounded-full transition-all ${
+                    dotIdx === currentMobileIndex ? 'w-5 bg-white' : 'w-1.5 bg-white/40'
+                  }`}
+                  aria-label={`Slide ${dotIdx + 1}`}
+                />
+              ))}
+            </div>
+          )}
+        </div>
+      </div>
 
       {/* ========================================================================= */}
-      {/* 2. MAIN HERO DISPLAY (Exact match with reference laptop photo)            */}
-      {/*    Full-bleed background image covering entire width & height             */}
+      {/* 2. DESKTOP HERO DISPLAY (sm and up)                                       */}
       {/* ========================================================================= */}
-      <div className={`relative w-full ${hasCustomMobileBanners ? 'hidden sm:block' : 'block'}`}>
+      <div className="hidden sm:block relative w-full">
         {/* Full-width Background Image Layer */}
         <div className="absolute inset-0 w-full h-full z-0 overflow-hidden">
           {desktopBanners.length > 0 ? (

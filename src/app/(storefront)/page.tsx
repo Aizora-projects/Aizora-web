@@ -47,26 +47,6 @@ export default async function HomePage() {
             </Link>
           </div>
 
-          {/* Mobile New Arrivals Banner Card from Reference Mockup */}
-          <div className="lg:hidden mb-8 bg-cream/80 border border-border-dark/60 rounded-[3px] p-4 flex items-center justify-between shadow-2xs">
-            <div>
-              <p className="text-[10px] tracking-[0.2em] uppercase text-brown-light font-medium">Collection</p>
-              <h3 className="font-heading text-base font-semibold tracking-[0.1em] uppercase text-brown-dark">
-                New Arrivals
-              </h3>
-              <p className="text-xs text-brown-light italic font-body">
-                Fresh Picks, Just for You
-              </p>
-            </div>
-            <Link
-              href="/shop?filter=new"
-              className="w-9 h-9 rounded-full bg-bronze text-white flex items-center justify-center shadow-xs hover:bg-bronze-dark transition-colors"
-              aria-label="View New Arrivals"
-            >
-              <ArrowRight className="w-4 h-4" />
-            </Link>
-          </div>
-
           {/* Product Grid */}
           {newArrivals.length > 0 ? (
             <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 md:gap-6 lg:gap-8">
