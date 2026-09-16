@@ -13,7 +13,7 @@ export function CategoryCircle({ category }: CategoryCircleProps) {
       className="flex flex-col items-center group w-full"
     >
       {/* Circular Image Container with Luxury Dual Halo */}
-      <div className="w-22 h-22 xs:w-26 xs:h-26 sm:w-32 sm:h-32 md:w-36 md:h-36 lg:w-40 lg:h-40 xl:w-46 xl:h-46 rounded-full p-1 sm:p-1.5 md:p-2 border border-[#D8C7B5]/80 bg-gradient-to-b from-[#FAF5EE] via-[#F4EDE2] to-[#EAE0D2] shadow-sm group-hover:border-tan group-hover:shadow-xl transition-all duration-500 group-hover:scale-105">
+      <div className="w-[94px] h-[94px] xs:w-[106px] xs:h-[106px] sm:w-32 sm:h-32 md:w-36 md:h-36 lg:w-40 lg:h-40 xl:w-44 xl:h-44 rounded-full p-1 sm:p-1.5 md:p-2 border border-[#D8C7B5]/80 bg-gradient-to-b from-[#FAF5EE] via-[#F4EDE2] to-[#EAE0D2] shadow-sm group-hover:border-tan group-hover:shadow-xl transition-all duration-500 group-hover:scale-105">
         <div className="w-full h-full rounded-full overflow-hidden relative bg-[#EFE8DC] flex items-center justify-center">
           {category.image_url ? (
             <Image
@@ -21,7 +21,7 @@ export function CategoryCircle({ category }: CategoryCircleProps) {
               alt={category.name}
               fill
               className="object-cover group-hover:scale-110 transition-transform duration-700 ease-out"
-              sizes="(max-width: 640px) 110px, (max-width: 1024px) 150px, 190px"
+              sizes="(max-width: 640px) 120px, (max-width: 1024px) 160px, 200px"
             />
           ) : (
             <div className="w-full h-full flex flex-col items-center justify-center bg-gradient-to-b from-[#FAF5EE] to-[#EAE0D2] text-[#8C6D53]">
@@ -34,13 +34,13 @@ export function CategoryCircle({ category }: CategoryCircleProps) {
       </div>
 
       {/* Category Name */}
-      <h3 className="font-heading text-xs sm:text-sm md:text-[15px] lg:text-base font-bold tracking-[0.02em] text-stone-900 group-hover:text-tan transition-colors text-center mt-2.5 sm:mt-3.5 leading-snug">
+      <h3 className="font-heading text-[11px] xs:text-xs sm:text-sm md:text-[15px] lg:text-base font-semibold tracking-wider uppercase text-stone-900 group-hover:text-tan transition-colors text-center mt-2 sm:mt-3 leading-snug">
         {category.name}
       </h3>
 
-      {/* Tagline */}
+      {/* Tagline — Hidden on mobile to prevent text cut-off, visible on tablet & desktop */}
       {category.tagline && (
-        <p className="text-[10px] sm:text-xs md:text-[13px] text-stone-500 italic font-body text-center mt-0.5 sm:mt-1 line-clamp-1 max-w-[110px] sm:max-w-[150px] lg:max-w-[170px]">
+        <p className="hidden sm:block text-xs md:text-[13px] text-stone-500 italic font-body text-center mt-1 line-clamp-1 max-w-[150px] lg:max-w-[170px]">
           {category.tagline}
         </p>
       )}

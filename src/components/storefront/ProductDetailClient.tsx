@@ -147,28 +147,37 @@ export default function ProductDetailClient({ product }: ProductDetailClientProp
                 </div>
               )}
 
-              {/* Badges */}
-              <div className="absolute top-4 left-4 flex flex-col gap-2">
+              {/* Badges — Refined Minimalist Luxury Badges */}
+              <div className="absolute top-4 left-4 flex flex-wrap items-center gap-1.5 max-w-[85%] z-10 pointer-events-none">
                 {!inStock ? (
-                  <span className="bg-charcoal/95 backdrop-blur-xs text-white text-[10px] px-3 py-1 tracking-widest uppercase font-semibold shadow-md">
+                  <span className="px-3 py-1 rounded-full text-[9px] sm:text-[10px] uppercase font-bold tracking-wider bg-stone-900/90 text-white backdrop-blur-xs shadow-sm">
                     Out of Stock
                   </span>
                 ) : (
                   <>
-                    {isOffer && (
-                      <span className="bg-bronze text-white text-[10px] px-3 py-1 tracking-wider uppercase font-semibold shadow-xs">
-                        Special Offer
+                    {isOffer ? (
+                      <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-[9px] sm:text-[10px] uppercase font-bold tracking-wider bg-bronze/95 text-white backdrop-blur-xs shadow-sm">
+                        <span>Offer</span>
+                        {discount > 0 && (
+                          <>
+                            <span className="opacity-60">•</span>
+                            <span>{discount}% Off</span>
+                          </>
+                        )}
                       </span>
-                    )}
-                    {product.is_new && (
-                      <span className="bg-brown-dark text-white text-[10px] px-3 py-1 tracking-widest uppercase font-medium">
-                        New
-                      </span>
-                    )}
-                    {discount > 0 && (
-                      <span className="bg-tan text-white text-[10px] px-3 py-1 tracking-wider uppercase font-medium">
-                        {discount}% Off
-                      </span>
+                    ) : (
+                      <>
+                        {product.is_new && (
+                          <span className="px-2.5 py-1 rounded-full text-[9px] sm:text-[10px] uppercase font-bold tracking-wider bg-white/95 text-stone-900 border border-stone-200/80 backdrop-blur-xs shadow-2xs">
+                            New
+                          </span>
+                        )}
+                        {discount > 0 && (
+                          <span className="px-2.5 py-1 rounded-full text-[9px] sm:text-[10px] uppercase font-bold tracking-wider bg-stone-900/85 text-white backdrop-blur-xs shadow-2xs">
+                            {discount}% Off
+                          </span>
+                        )}
+                      </>
                     )}
                   </>
                 )}

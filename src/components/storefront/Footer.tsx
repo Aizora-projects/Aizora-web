@@ -1,11 +1,38 @@
+'use client';
+
+import { useState } from 'react';
 import Link from 'next/link';
 import Image from 'next/image';
-import { Truck, Diamond, Leaf, Heart } from 'lucide-react';
+import { Truck, Diamond, Leaf, Heart, ChevronDown } from 'lucide-react';
 
 export default function Footer() {
+  const [openSection, setOpenSection] = useState<string | null>(null);
+
+  const toggleSection = (section: string) => {
+    setOpenSection((prev) => (prev === section ? null : section));
+  };
+
+  const collections = [
+    { name: 'New Arrivals', href: '/shop?filter=new' },
+    { name: 'Cotton Set', href: '/category/cotton' },
+    { name: 'Ethnic Wear', href: '/category/ethnic-wear' },
+    { name: 'Co-ord Set', href: '/category/co-ord-set' },
+    { name: 'Party Wear', href: '/category/party-wear' },
+    { name: 'Western Wear', href: '/category/western-wear' },
+    { name: 'Plus Size', href: '/category/plus-size' },
+    { name: 'Offer Items', href: '/offers' },
+  ];
+
+  const customerCare = [
+    { name: 'Track Your Order', href: '/account' },
+    { name: 'Shopping Bag', href: '/cart' },
+    { name: 'Wishlist', href: '/wishlist' },
+    { name: 'My Account', href: '/account' },
+  ];
+
   return (
     <footer className="mt-auto">
-      {/* Brand Promise Strip — Exact Match from Bottom of Mockup */}
+      {/* Brand Promise Strip */}
       <section className="bg-promise-bg border-t border-b border-border-dark/40 py-7 lg:py-9">
         <div className="max-w-7xl mx-auto px-4 lg:px-8">
           <div className="grid grid-cols-2 lg:grid-cols-4 gap-6 lg:gap-0 lg:divide-x lg:divide-border-dark/50">
@@ -34,43 +61,141 @@ export default function Footer() {
       {/* Main Luxury Editorial Footer */}
       <div className="bg-[#241913] text-cream/80 py-12 lg:py-16">
         <div className="max-w-7xl mx-auto px-4 lg:px-8">
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8 lg:gap-12">
-            {/* Brand Column */}
-            <div>
-              <div className="mb-4">
-                <Image
-                  src="/Aizora-logo.png"
-                  alt="AIZORA"
-                  width={150}
-                  height={50}
-                  className="h-10 w-auto object-contain brightness-0 invert opacity-90"
-                  unoptimized
+          {/* Brand Column — Always Visible */}
+          <div className="mb-8 md:mb-12">
+            <div className="mb-4">
+              <Image
+                src="/Aizora-logo.png"
+                alt="AIZORA"
+                width={150}
+                height={50}
+                className="h-10 w-auto object-contain brightness-0 invert opacity-90"
+                unoptimized
+              />
+            </div>
+            <p className="text-sm leading-relaxed text-cream/60 font-body max-w-md">
+              Curated premium women&apos;s fashion for every expression. Timeless elegance, modern confidence.
+            </p>
+            <p className="text-xs text-tan mt-3 tracking-wider uppercase font-medium">
+              Pan India Delivery &nbsp;|&nbsp; Handcrafted Quality
+            </p>
+          </div>
+
+          {/* ========================================================= */}
+          {/* MOBILE VIEW: Accordion Style (< md)                       */}
+          {/* ========================================================= */}
+          <div className="md:hidden divide-y divide-white/10 border-t border-b border-white/10 mb-8">
+            {/* 1. Collections Accordion */}
+            <div className="py-3.5">
+              <button
+                type="button"
+                onClick={() => toggleSection('collections')}
+                className="w-full flex items-center justify-between text-xs tracking-[0.18em] uppercase font-semibold text-cream text-left py-1"
+                aria-expanded={openSection === 'collections'}
+              >
+                <span>Collections</span>
+                <ChevronDown
+                  className={`w-4 h-4 text-tan transition-transform duration-300 ${
+                    openSection === 'collections' ? 'rotate-180' : ''
+                  }`}
                 />
-              </div>
-              <p className="text-sm leading-relaxed text-cream/60 font-body">
-                Curated premium women&apos;s fashion for every expression. Timeless elegance, modern confidence.
-              </p>
-              <p className="text-xs text-tan mt-4 tracking-wider uppercase font-medium">
-                Pan India Delivery &nbsp;|&nbsp; Handcrafted Quality
-              </p>
+              </button>
+              {openSection === 'collections' && (
+                <ul className="pt-3 pb-2 space-y-2.5 font-body">
+                  {collections.map((item) => (
+                    <li key={item.name}>
+                      <Link
+                        href={item.href}
+                        className="text-xs text-cream/70 hover:text-tan transition-colors block py-0.5"
+                      >
+                        {item.name}
+                      </Link>
+                    </li>
+                  ))}
+                </ul>
+              )}
             </div>
 
+            {/* 2. Customer Care Accordion */}
+            <div className="py-3.5">
+              <button
+                type="button"
+                onClick={() => toggleSection('care')}
+                className="w-full flex items-center justify-between text-xs tracking-[0.18em] uppercase font-semibold text-cream text-left py-1"
+                aria-expanded={openSection === 'care'}
+              >
+                <span>Customer Care</span>
+                <ChevronDown
+                  className={`w-4 h-4 text-tan transition-transform duration-300 ${
+                    openSection === 'care' ? 'rotate-180' : ''
+                  }`}
+                />
+              </button>
+              {openSection === 'care' && (
+                <ul className="pt-3 pb-2 space-y-2.5 font-body text-xs text-cream/70">
+                  {customerCare.map((item) => (
+                    <li key={item.name}>
+                      <Link href={item.href} className="hover:text-tan transition-colors block py-0.5">
+                        {item.name}
+                      </Link>
+                    </li>
+                  ))}
+                  <li className="pt-2 text-cream/50 text-[11px]">
+                    Support: care@aizora.in
+                  </li>
+                </ul>
+              )}
+            </div>
+
+            {/* 3. Newsletter & Promise Accordion */}
+            <div className="py-3.5">
+              <button
+                type="button"
+                onClick={() => toggleSection('newsletter')}
+                className="w-full flex items-center justify-between text-xs tracking-[0.18em] uppercase font-semibold text-cream text-left py-1"
+                aria-expanded={openSection === 'newsletter'}
+              >
+                <span>Wear Your Elegance</span>
+                <ChevronDown
+                  className={`w-4 h-4 text-tan transition-transform duration-300 ${
+                    openSection === 'newsletter' ? 'rotate-180' : ''
+                  }`}
+                />
+              </button>
+              {openSection === 'newsletter' && (
+                <div className="pt-3 pb-2 space-y-3 font-body">
+                  <p className="text-xs text-cream/60 leading-relaxed">
+                    Subscribe to receive private previews, style edits, and exclusive invitations.
+                  </p>
+                  <div className="flex gap-2">
+                    <input
+                      type="email"
+                      placeholder="Your email address"
+                      className="bg-white/5 border border-white/15 px-3 py-2 text-xs text-cream placeholder:text-cream/40 flex-1 focus:outline-none focus:border-tan rounded-xs"
+                    />
+                    <button
+                      type="button"
+                      className="bg-tan hover:bg-tan-dark text-white px-4 py-2 text-xs tracking-wider uppercase font-semibold transition-colors rounded-xs"
+                    >
+                      Join
+                    </button>
+                  </div>
+                </div>
+              )}
+            </div>
+          </div>
+
+          {/* ========================================================= */}
+          {/* DESKTOP VIEW: Multi-Column Grid (md and up)              */}
+          {/* ========================================================= */}
+          <div className="hidden md:grid md:grid-cols-3 gap-8 lg:gap-12 mb-8">
             {/* Collections */}
             <div>
               <h4 className="text-xs tracking-[0.18em] uppercase font-semibold text-cream mb-4 font-body">
                 Collections
               </h4>
               <ul className="space-y-2 font-body">
-                {[
-                  { name: 'New Arrivals', href: '/shop?filter=new' },
-                  { name: 'Cotton Set', href: '/category/cotton' },
-                  { name: 'Ethnic Wear', href: '/category/ethnic-wear' },
-                  { name: 'Co-ord Set', href: '/category/co-ord-set' },
-                  { name: 'Party Wear', href: '/category/party-wear' },
-                  { name: 'Western Wear', href: '/category/western-wear' },
-                  { name: 'Plus Size', href: '/category/plus-size' },
-                  { name: 'Offer Items', href: '/offers' },
-                ].map((item) => (
+                {collections.map((item) => (
                   <li key={item.name}>
                     <Link
                       href={item.href}
@@ -89,26 +214,13 @@ export default function Footer() {
                 Customer Care
               </h4>
               <ul className="space-y-2 font-body text-xs sm:text-sm text-cream/60">
-                <li>
-                  <Link href="/account" className="hover:text-tan transition-colors">
-                    Track Your Order
-                  </Link>
-                </li>
-                <li>
-                  <Link href="/cart" className="hover:text-tan transition-colors">
-                    Shopping Bag
-                  </Link>
-                </li>
-                <li>
-                  <Link href="/wishlist" className="hover:text-tan transition-colors">
-                    Wishlist
-                  </Link>
-                </li>
-                <li>
-                  <Link href="/account" className="hover:text-tan transition-colors">
-                    My Account
-                  </Link>
-                </li>
+                {customerCare.map((item) => (
+                  <li key={item.name}>
+                    <Link href={item.href} className="hover:text-tan transition-colors">
+                      {item.name}
+                    </Link>
+                  </li>
+                ))}
                 <li className="pt-2 text-cream/50 text-xs">
                   Support: care@aizora.in
                 </li>
@@ -127,11 +239,11 @@ export default function Footer() {
                 <input
                   type="email"
                   placeholder="Your email address"
-                  className="bg-white/5 border border-white/15 px-3 py-2 text-xs text-cream placeholder:text-cream/40 flex-1 focus:outline-none focus:border-tan"
+                  className="bg-white/5 border border-white/15 px-3 py-2 text-xs text-cream placeholder:text-cream/40 flex-1 focus:outline-none focus:border-tan rounded-xs"
                 />
                 <button
                   type="button"
-                  className="bg-tan hover:bg-tan-dark text-white px-4 py-2 text-xs tracking-wider uppercase font-medium transition-colors"
+                  className="bg-tan hover:bg-tan-dark text-white px-4 py-2 text-xs tracking-wider uppercase font-semibold transition-colors rounded-xs"
                 >
                   Join
                 </button>
@@ -139,10 +251,24 @@ export default function Footer() {
             </div>
           </div>
 
-          {/* Bottom Bar */}
-          <div className="border-t border-white/10 mt-12 pt-8 flex flex-col sm:flex-row items-center justify-between gap-4 text-xs text-cream/40 font-body">
+          {/* Bottom Bar — With Crafted by ekodrix */}
+          <div className="border-t border-white/10 pt-8 flex flex-col sm:flex-row items-center justify-between gap-3 text-xs text-cream/50 font-body text-center sm:text-left">
             <p>&copy; {new Date().getFullYear()} AIZORA. All rights reserved.</p>
-            <p className="tracking-widest uppercase text-[10px]">
+
+            {/* Crafted by ekodrix link */}
+            <p className="flex items-center justify-center gap-1.5 text-xs text-cream/70">
+              <span>Crafted by</span>
+              <a
+                href="https://ekodrix.com"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="text-tan hover:text-white font-medium underline underline-offset-4 transition-colors"
+              >
+                ekodrix
+              </a>
+            </p>
+
+            <p className="tracking-widest uppercase text-[10px] text-cream/40">
               Wear Your Elegance &nbsp;|&nbsp; Crafted for Indian Women
             </p>
           </div>

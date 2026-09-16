@@ -41,28 +41,37 @@ export default function ProductCard({ product }: ProductCardProps) {
           </div>
         )}
 
-        {/* Badges */}
-        <div className="absolute top-2.5 left-2.5 flex flex-col gap-1">
+        {/* Badges — Refined, Minimalist Luxury Badges */}
+        <div className="absolute top-2.5 left-2.5 flex flex-wrap items-center gap-1 max-w-[85%] z-10 pointer-events-none">
           {isOutOfStock ? (
-            <span className="bg-charcoal/95 backdrop-blur-xs text-white text-[9px] px-2.5 py-0.5 tracking-widest uppercase font-semibold shadow-xs">
+            <span className="px-2.5 py-0.5 rounded-full text-[8.5px] uppercase font-bold tracking-wider bg-stone-900/90 text-white backdrop-blur-xs shadow-xs">
               Sold Out
             </span>
           ) : (
             <>
-              {isOffer && (
-                <span className="bg-bronze text-white text-[9px] px-2 py-0.5 tracking-wider uppercase font-medium shadow-2xs">
-                  Special Offer
+              {isOffer ? (
+                <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-[8.5px] uppercase font-bold tracking-wider bg-bronze/95 text-white backdrop-blur-xs shadow-xs">
+                  <span>Offer</span>
+                  {discount > 0 && (
+                    <>
+                      <span className="opacity-60">•</span>
+                      <span>{discount}% Off</span>
+                    </>
+                  )}
                 </span>
-              )}
-              {product.is_new && (
-                <span className="bg-brown-dark text-white text-[9px] px-2 py-0.5 tracking-widest uppercase font-medium">
-                  New
-                </span>
-              )}
-              {discount > 0 && (
-                <span className="bg-tan text-white text-[9px] px-2 py-0.5 tracking-wider uppercase font-medium">
-                  {discount}% Off
-                </span>
+              ) : (
+                <>
+                  {product.is_new && (
+                    <span className="px-2 py-0.5 rounded-full text-[8.5px] uppercase font-bold tracking-wider bg-white/95 text-stone-900 border border-stone-200/80 backdrop-blur-xs shadow-2xs">
+                      New
+                    </span>
+                  )}
+                  {discount > 0 && (
+                    <span className="px-2 py-0.5 rounded-full text-[8.5px] uppercase font-bold tracking-wider bg-stone-900/85 text-white backdrop-blur-xs shadow-2xs">
+                      {discount}% Off
+                    </span>
+                  )}
+                </>
               )}
             </>
           )}
