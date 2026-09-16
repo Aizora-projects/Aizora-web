@@ -1,26 +1,80 @@
 @import "tailwindcss";
 
-:root {
-  --background: #ffffff;
-  --foreground: #171717;
-}
-
 @theme inline {
-  --color-background: var(--background);
-  --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
+  /* AIZORA Brand Colors — Exact Match from Editorial Reference Mockup */
+  --color-ivory: #FAF7F2;
+  --color-cream: #F4EEE8;
+  --color-beige: #EDE5DC;
+  --color-sand: #DDD2C4;
+  --color-tan: #B38E6A;
+  --color-tan-light: #C7A482;
+  --color-tan-dark: #9E7954;
+  --color-gold: #B38E6A;
+  --color-gold-light: #C7A482;
+  --color-gold-dark: #9E7954;
+  --color-bronze: #8F6B4E;
+  --color-bronze-dark: #7B583E;
+  --color-brown-dark: #2C1E18;
+  --color-brown-light: #7D6757;
+  --color-brown-muted: #8C7767;
+  --color-border: #E8DFD3;
+  --color-border-dark: #D6C8B8;
+  --color-promise-bg: #ECE4DA;
+
+  /* Status Colors */
+  --color-success: #16A34A;
+  --color-error: #DC2626;
+  --color-warning: #D97706;
+  --color-info: #2563EB;
+
+  /* Admin colors — Clean White, Cream & Light Linen (No dark brown) */
+  --color-admin-bg: #FAF8F5;
+  --color-admin-sidebar: #FFFFFF;
+  --color-admin-card: #FFFFFF;
+  --color-admin-border: #E8E2D8;
+  --color-admin-text: #1C1917;
+  --color-admin-muted: #78716C;
+  --color-admin-hover: #F4ECE1;
+
+  /* Typography */
+  --font-heading: var(--font-heading), 'Playfair Display', Georgia, serif;
+  --font-body: var(--font-body), 'Plus Jakarta Sans', -apple-system, sans-serif;
+  --font-script: var(--font-script), 'Alex Brush', cursive;
+
+  /* Spacing */
+  --spacing-18: 4.5rem;
+  --spacing-22: 5.5rem;
+  --spacing-30: 7.5rem;
+
+  /* Animation */
+  --animate-fade-in: fade-in 0.5s ease-out;
+  --animate-slide-up: slide-up 0.5s ease-out;
+  --animate-slide-down: slide-down 0.3s ease-out;
+  --animate-scale-in: scale-in 0.3s ease-out;
 }
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
-  }
+@keyframes fade-in {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+@keyframes slide-up {
+  from { opacity: 0; transform: translateY(20px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes slide-down {
+  from { opacity: 0; transform: translateY(-10px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes scale-in {
+  from { opacity: 0; transform: scale(0.95); }
+  to { opacity: 1; transform: scale(1); }
 }
 
 body {
-  background: var(--background);
-  color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+  font-family: var(--font-body);
+  background-color: var(--color-ivory);
+  color: var(--color-brown-dark);
 }
