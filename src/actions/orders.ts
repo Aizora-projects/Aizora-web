@@ -91,12 +91,39 @@ export async function createWhatsAppOrder(input: CreateOrderInput) {
       return { error: 'Failed to create order. Please try again.' };
     }
 
-    // 4. Create order items
+    // 4. Create order items (with auto-lookup of product image if missing)
+    const missingImageProductIds = items
+      .filter((i) => !i.product_image_url && i.product_id)
+      .map((i) => i.product_id as string);
+
+    const imageMap = new Map<string, string>();
+    if (missingImageProductIds.length > 0) {
+      try {
+        const { data: foundImages } = await adminClient
+          .from('product_images')
+          .select('product_id, secure_url, is_primary, sort_order')
+          .in('product_id', missingImageProductIds);
+
+        if (foundImages && foundImages.length > 0) {
+          // Sort to prioritize is_primary = true
+          foundImages.sort((a, b) => (b.is_primary ? 1 : 0) - (a.is_primary ? 1 : 0));
+          for (const img of foundImages) {
+            if (!imageMap.has(img.product_id) && img.secure_url) {
+              imageMap.set(img.product_id, img.secure_url);
+            }
+          }
+        }
+      } catch (err) {
+        console.error('Error fetching fallback product images for order:', err);
+      }
+    }
+
     const orderItemsToInsert = items.map((item) => ({
       order_id: order.id,
       product_id: item.product_id || null,
       product_name: item.variant_info ? `${item.product_name} (${item.variant_info})` : item.product_name,
-      product_image_url: item.product_image_url || null,
+      product_image_url:
+        item.product_image_url || (item.product_id ? imageMap.get(item.product_id) : null) || null,
       quantity: item.quantity,
       price_at_purchase: item.price,
       total: item.price * item.quantity,

@@ -83,13 +83,19 @@ export default function ProductDetailClient({ product }: ProductDetailClientProp
 
   const inStock = product.stock > 0;
 
+  const imageToStore =
+    primaryImage?.secure_url ||
+    (primaryImage as any)?.url ||
+    product.images?.[0]?.secure_url ||
+    null;
+
   const handleAddToCart = () => {
     if (!inStock) return;
     addItem({
       product_id: product.id,
       product_name: product.name,
       product_slug: product.slug,
-      product_image: primaryImage?.secure_url || null,
+      product_image: imageToStore,
       price: product.price,
       stock: product.stock,
       size: selectedSize || undefined,
@@ -105,7 +111,7 @@ export default function ProductDetailClient({ product }: ProductDetailClientProp
       product_id: product.id,
       product_name: product.name,
       product_slug: product.slug,
-      product_image: primaryImage?.secure_url || null,
+      product_image: imageToStore,
       price: product.price,
       stock: product.stock,
       size: selectedSize || undefined,
@@ -121,7 +127,7 @@ export default function ProductDetailClient({ product }: ProductDetailClientProp
   const variantInfo = variantParts.length > 0 ? variantParts.join(', ') : undefined;
 
   const isOffer = product.is_offer || product.variants?.some((v) => v.name.toLowerCase() === 'offer');
-  const isBestSeller = product.is_bestseller || product.is_featured || product.variants?.some((v) => v.name.toLowerCase() === 'bestseller');
+  const isBestSeller = product.is_bestseller || product.variants?.some((v) => v.name.toLowerCase() === 'bestseller');
 
   return (
     <>

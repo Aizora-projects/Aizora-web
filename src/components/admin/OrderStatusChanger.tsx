@@ -8,11 +8,8 @@ import {
   Copy,
   Check,
   ExternalLink,
-  Send,
-  Sparkles,
   Phone,
 } from 'lucide-react';
-import { formatPrice } from '@/lib/utils';
 
 const STATUS_CONFIG: Record<
   string,
@@ -78,6 +75,7 @@ export default function OrderStatusChanger({
   shippingCity = '',
 }: OrderStatusChangerProps) {
   const [status, setStatus] = useState(currentStatus);
+  const [activeTemplate, setActiveTemplate] = useState(currentStatus);
   const [isSaving, setIsSaving] = useState(false);
   const [copied, setCopied] = useState(false);
   const [customPhone, setCustomPhone] = useState(customerPhone || '');
@@ -152,6 +150,7 @@ export default function OrderStatusChanger({
 
       if (response.ok) {
         setStatus(newStatus);
+        setActiveTemplate(newStatus);
         // Automatically switch the prefill message to match the new status
         setMessageText(generateMessage(newStatus));
         router.refresh();
@@ -162,6 +161,11 @@ export default function OrderStatusChanger({
       alert('Failed to update status. Please try again.');
     }
     setIsSaving(false);
+  };
+
+  const handleTemplateSwitch = (targetStatus: string) => {
+    setActiveTemplate(targetStatus);
+    setMessageText(generateMessage(targetStatus));
   };
 
   // Clean phone number for WhatsApp wa.me link
@@ -191,22 +195,23 @@ export default function OrderStatusChanger({
       {/* 1. Status Dropdown & Visual Indicator */}
       <div className="space-y-2">
         <div className="flex items-center justify-between">
-          <span className="text-xs font-semibold text-stone-600 uppercase tracking-wider">
+          <span className="text-[11px] font-bold text-stone-600 uppercase tracking-wider">
             Current Status
           </span>
           <span
-            className={`inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-xs font-bold border ${activeConfig.badge}`}
+            className={`inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-bold border shadow-2xs ${activeConfig.badge}`}
           >
-            <span className={`w-1.5 h-1.5 rounded-full ${activeConfig.dot}`} />
+            <span className={`w-2 h-2 rounded-full ${activeConfig.dot} ${status === 'pending' || status === 'processing' ? 'animate-pulse' : ''}`} />
             <span>{activeConfig.label}</span>
           </span>
         </div>
 
+        {/* 16px font on mobile prevents iOS Safari auto-zoom */}
         <select
           value={status}
           onChange={(e) => handleChangeStatus(e.target.value)}
           disabled={isSaving}
-          className="w-full bg-[#FAF8F5] border border-admin-border rounded-lg px-3.5 py-2.5 text-sm font-semibold text-stone-900 focus:bg-white focus:outline-none focus:border-tan focus:ring-2 focus:ring-tan/20 transition-all disabled:opacity-50"
+          className="w-full bg-[#FAF8F5] border border-admin-border rounded-xl px-4 py-3 sm:py-2.5 text-base sm:text-sm font-semibold text-stone-900 focus:bg-white focus:outline-none focus:border-tan focus:ring-2 focus:ring-tan/20 transition-all disabled:opacity-50 min-h-[46px]"
         >
           {statuses.map((s) => {
             const config = STATUS_CONFIG[s];
@@ -219,66 +224,71 @@ export default function OrderStatusChanger({
         </select>
 
         {isSaving && (
-          <p className="text-xs text-stone-500 flex items-center gap-1.5 pt-1">
+          <p className="text-xs text-tan font-medium flex items-center gap-1.5 pt-1">
             <Loader2 className="w-3.5 h-3.5 animate-spin text-tan" />
-            <span>Updating order status...</span>
+            <span>Updating status...</span>
           </p>
         )}
       </div>
 
       {/* 2. WhatsApp Customer Notification Panel */}
-      <div className="pt-4 border-t border-admin-border/70 space-y-3">
+      <div className="pt-4 border-t border-admin-border/70 space-y-3.5">
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-2">
-            <div className="w-6 h-6 rounded-full bg-[#25D366]/15 text-[#25D366] flex items-center justify-center">
+            <div className="w-6 h-6 rounded-full bg-[#25D366]/15 text-[#25D366] flex items-center justify-center flex-shrink-0">
               <MessageCircle className="w-3.5 h-3.5 fill-[#25D366]" />
             </div>
             <h3 className="text-xs font-bold uppercase tracking-wider text-stone-900">
               Notify Customer on WhatsApp
             </h3>
           </div>
-          <span className="text-[10px] text-stone-500 font-mono">
+          <span className="text-[11px] text-stone-500 font-mono bg-stone-100 px-2 py-0.5 rounded">
             {cleanPhone ? `+${cleanPhone}` : 'No phone'}
           </span>
         </div>
 
         {/* Quick Message Template Pills */}
         <div>
-          <label className="block text-[11px] font-semibold text-stone-500 uppercase tracking-wider mb-1.5">
+          <label className="block text-[10px] font-bold text-stone-500 uppercase tracking-wider mb-2">
             Quick Template Switch
           </label>
-          <div className="flex flex-wrap gap-1.5">
+          <div className="grid grid-cols-2 sm:flex sm:flex-wrap gap-1.5">
             {statuses.map((s) => {
               const cfg = STATUS_CONFIG[s];
+              const isSelected = activeTemplate === s;
               return (
                 <button
                   key={s}
                   type="button"
-                  onClick={() => setMessageText(generateMessage(s))}
-                  className="px-2.5 py-1 rounded-md text-[11px] font-medium bg-[#FAF8F5] hover:bg-stone-100 text-stone-700 border border-admin-border transition-colors flex items-center gap-1"
+                  onClick={() => handleTemplateSwitch(s)}
+                  className={`px-3 py-2 sm:py-1.5 rounded-lg text-xs font-semibold transition-all flex items-center justify-center sm:justify-start gap-1.5 min-h-[38px] ${
+                    isSelected
+                      ? 'bg-tan text-white shadow-xs border border-tan'
+                      : 'bg-[#FAF8F5] hover:bg-stone-100 text-stone-700 border border-admin-border'
+                  }`}
                 >
-                  <span>{cfg.icon}</span>
-                  <span>{cfg.label.split('/')[0].trim()}</span>
+                  <span className="text-sm sm:text-xs">{cfg.icon}</span>
+                  <span className="truncate">{cfg.label.split('/')[0].trim()}</span>
                 </button>
               );
             })}
           </div>
         </div>
 
-        {/* Customer Phone Input (in case admin wants to edit or add) */}
+        {/* Customer Phone Input (in case missing or needs edit) */}
         {!customerPhone && (
           <div>
-            <label className="block text-[11px] font-semibold text-stone-500 uppercase tracking-wider mb-1">
+            <label className="block text-[10px] font-bold text-stone-500 uppercase tracking-wider mb-1">
               Customer Mobile Number (10 digits)
             </label>
             <div className="relative">
-              <Phone className="w-3.5 h-3.5 text-stone-400 absolute left-3 top-1/2 -translate-y-1/2" />
+              <Phone className="w-4 h-4 text-stone-400 absolute left-3.5 top-1/2 -translate-y-1/2" />
               <input
-                type="text"
+                type="tel"
                 value={customPhone}
                 onChange={(e) => setCustomPhone(e.target.value)}
                 placeholder="e.g. 9876543210"
-                className="w-full pl-9 pr-3 py-1.5 text-xs bg-[#FAF8F5] border border-admin-border rounded-lg text-stone-900 focus:bg-white focus:outline-none focus:border-tan font-mono"
+                className="w-full pl-10 pr-3 py-2.5 text-base sm:text-xs bg-[#FAF8F5] border border-admin-border rounded-xl text-stone-900 focus:bg-white focus:outline-none focus:border-tan font-mono min-h-[44px]"
               />
             </div>
           </div>
@@ -286,24 +296,24 @@ export default function OrderStatusChanger({
 
         {/* Editable Message Textarea */}
         <div>
-          <div className="flex items-center justify-between mb-1">
-            <label className="block text-[11px] font-semibold text-stone-500 uppercase tracking-wider">
+          <div className="flex items-center justify-between mb-1.5">
+            <label className="block text-[10px] font-bold text-stone-500 uppercase tracking-wider">
               Pre-filled Message Preview (Editable)
             </label>
             <button
               type="button"
               onClick={handleCopyMessage}
-              className="text-[11px] font-semibold text-stone-600 hover:text-stone-900 flex items-center gap-1"
+              className="text-xs font-semibold text-stone-600 hover:text-stone-900 flex items-center gap-1 px-2 py-1 rounded bg-stone-100 hover:bg-stone-200 transition-colors"
             >
               {copied ? (
                 <>
-                  <Check className="w-3 h-3 text-emerald-600" />
-                  <span className="text-emerald-600">Copied</span>
+                  <Check className="w-3.5 h-3.5 text-emerald-600" />
+                  <span className="text-emerald-600 font-bold">Copied</span>
                 </>
               ) : (
                 <>
-                  <Copy className="w-3 h-3" />
-                  <span>Copy</span>
+                  <Copy className="w-3.5 h-3.5" />
+                  <span>Copy Text</span>
                 </>
               )}
             </button>
@@ -312,33 +322,33 @@ export default function OrderStatusChanger({
             rows={5}
             value={messageText}
             onChange={(e) => setMessageText(e.target.value)}
-            className="w-full bg-[#FAF8F5] border border-admin-border rounded-lg p-3 text-xs text-stone-800 leading-relaxed font-sans focus:bg-white focus:outline-none focus:border-tan focus:ring-1 focus:ring-tan"
+            className="w-full bg-[#FAF8F5] border border-admin-border rounded-xl p-3.5 text-base sm:text-xs text-stone-800 leading-relaxed font-sans focus:bg-white focus:outline-none focus:border-tan focus:ring-1 focus:ring-tan shadow-2xs"
             placeholder="Type your WhatsApp notification message here..."
           />
-          <p className="text-[10px] text-stone-400 mt-1">
-            Tip: You can insert your courier tracking link or custom delivery notes directly in the box above.
+          <p className="text-[10.5px] text-stone-400 mt-1.5 leading-normal">
+            Tip: You can insert your courier tracking link or custom delivery notes directly in the box above before sending.
           </p>
         </div>
 
-        {/* WhatsApp Action Button */}
+        {/* Primary WhatsApp Action Button — Highly optimized for iPhone touch */}
         {whatsappUrl ? (
           <a
             href={whatsappUrl}
             target="_blank"
             rel="noopener noreferrer"
-            className="w-full inline-flex items-center justify-center gap-2 bg-[#25D366] hover:bg-[#1EBE5D] text-white py-2.5 px-4 rounded-lg text-xs font-bold uppercase tracking-wider transition-all shadow-sm hover:shadow"
+            className="w-full inline-flex items-center justify-center gap-2.5 bg-[#25D366] hover:bg-[#20bd5a] active:scale-[0.98] text-white py-3.5 px-5 rounded-xl text-xs sm:text-sm font-bold uppercase tracking-wider transition-all shadow-md hover:shadow-lg min-h-[50px]"
           >
-            <MessageCircle className="w-4 h-4 fill-white" />
+            <MessageCircle className="w-5 h-5 fill-white flex-shrink-0" />
             <span>Send Message on WhatsApp</span>
-            <ExternalLink className="w-3.5 h-3.5" />
+            <ExternalLink className="w-4 h-4 flex-shrink-0" />
           </a>
         ) : (
-          <div className="p-3 bg-amber-50 border border-amber-200 rounded-lg text-xs text-amber-800 flex items-center justify-between">
-            <span>No valid phone number for WhatsApp</span>
+          <div className="p-3 bg-amber-50 border border-amber-200 rounded-xl text-xs text-amber-800 flex items-center justify-between">
+            <span>No phone number provided</span>
             <button
               type="button"
               onClick={handleCopyMessage}
-              className="px-2.5 py-1 bg-white border border-amber-300 rounded font-semibold text-[11px] text-amber-900"
+              className="px-3 py-1.5 bg-white border border-amber-300 rounded-lg font-semibold text-xs text-amber-900 shadow-2xs"
             >
               Copy Text
             </button>

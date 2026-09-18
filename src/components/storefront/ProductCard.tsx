@@ -17,7 +17,7 @@ export default function ProductCard({ product }: ProductCardProps) {
 
   const isOutOfStock = product.stock <= 0;
   const isOffer = product.is_offer || product.variants?.some((v) => v.name.toLowerCase() === 'offer');
-  const isBestSeller = product.is_bestseller || product.is_featured || product.variants?.some((v) => v.name.toLowerCase() === 'bestseller');
+  const isBestSeller = product.is_bestseller || product.variants?.some((v) => v.name.toLowerCase() === 'bestseller');
 
   return (
     <div className="group relative">

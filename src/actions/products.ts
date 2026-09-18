@@ -68,15 +68,35 @@ export async function getProducts(options?: {
     }
   }
 
+  // If filtering for bestseller items, resolve product IDs tagged with bestseller variant
+  let bestsellerProductIds: string[] | null = null;
+  if (isBestseller) {
+    const { data: bestsellerVariants } = await supabase
+      .from('product_variants')
+      .select('product_id')
+      .eq('name', 'bestseller');
+
+    bestsellerProductIds = (bestsellerVariants || []).map((v) => v.product_id);
+    if (bestsellerProductIds.length === 0) {
+      return {
+        data: [],
+        count: 0,
+        page,
+        pageSize,
+        totalPages: 0,
+      };
+    }
+  }
+
   let query = supabase
     .from('products')
     .select('*, category:categories(*), images:product_images(*), variants:product_variants(*)', { count: 'exact' });
 
   if (offerProductIds !== null) query = query.in('id', offerProductIds);
+  if (bestsellerProductIds !== null) query = query.in('id', bestsellerProductIds);
   if (categoryId) query = query.eq('category_id', categoryId);
   if (isActive !== undefined) query = query.eq('is_active', isActive);
   if (isFeatured !== undefined) query = query.eq('is_featured', isFeatured);
-  if (isBestseller !== undefined) query = query.eq('is_featured', isBestseller);
   if (isNew !== undefined) query = query.eq('is_new', isNew);
   if (search) query = query.ilike('name', `%${search}%`);
 
@@ -101,7 +121,7 @@ export async function getProducts(options?: {
   const mapped = ((data as unknown as Product[]) || []).map((p) => ({
     ...p,
     is_offer: p.variants?.some((v) => v.name.toLowerCase() === 'offer') ?? false,
-    is_bestseller: p.is_featured || (p.variants?.some((v) => v.name.toLowerCase() === 'bestseller') ?? false),
+    is_bestseller: p.variants?.some((v) => v.name.toLowerCase() === 'bestseller') ?? false,
   }));
 
   return {
@@ -125,7 +145,7 @@ export async function getProductBySlug(slug: string) {
   if (error || !data) return null;
   const prod = data as unknown as Product;
   prod.is_offer = prod.variants?.some((v) => v.name.toLowerCase() === 'offer') ?? false;
-  prod.is_bestseller = prod.is_featured || (prod.variants?.some((v) => v.name.toLowerCase() === 'bestseller') ?? false);
+  prod.is_bestseller = prod.variants?.some((v) => v.name.toLowerCase() === 'bestseller') ?? false;
   return prod;
 }
 
@@ -141,7 +161,7 @@ export async function getProductById(id: string) {
   if (error || !data) return null;
   const prod = data as unknown as Product;
   prod.is_offer = prod.variants?.some((v) => v.name.toLowerCase() === 'offer') ?? false;
-  prod.is_bestseller = prod.is_featured || (prod.variants?.some((v) => v.name.toLowerCase() === 'bestseller') ?? false);
+  prod.is_bestseller = prod.variants?.some((v) => v.name.toLowerCase() === 'bestseller') ?? false;
   return prod;
 }
 

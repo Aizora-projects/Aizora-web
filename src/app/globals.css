@@ -78,3 +78,17 @@ body {
   background-color: var(--color-ivory);
   color: var(--color-brown-dark);
 }
+
+/* Hide scrollbar utility for touch-friendly horizontal swipe */
+.no-scrollbar::-webkit-scrollbar {
+  display: none;
+}
+.no-scrollbar {
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+}
+
+/* Mobile Safari & iPhone Touch Enhancements */
+button, a, input, select, textarea {
+  -webkit-tap-highlight-color: transparent;
+}

@@ -44,7 +44,7 @@ export default function ProductForm({ product, categories }: ProductFormProps) {
     is_featured: product?.is_featured ?? false,
     is_new: product?.is_new ?? true,
     is_offer: product?.variants?.some((v) => v.name.toLowerCase() === 'offer') ?? false,
-    is_bestseller: product?.is_bestseller ?? product?.is_featured ?? (product?.variants?.some((v) => v.name.toLowerCase() === 'bestseller') ?? false),
+    is_bestseller: product?.variants?.some((v) => v.name.toLowerCase() === 'bestseller') ?? false,
   });
 
   const [images, setImages] = useState<ProductImage[]>(
