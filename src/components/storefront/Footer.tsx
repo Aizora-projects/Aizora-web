@@ -26,7 +26,8 @@ export default function Footer() {
   const customerCare = [
     { name: 'Track Your Order', href: '/account' },
     { name: 'Shopping Bag', href: '/cart' },
-    { name: 'Wishlist', href: '/wishlist' },
+    { name: 'Privacy Policy', href: '/privacy-policy' },
+    { name: 'Terms & Conditions', href: '/terms-and-conditions' },
     { name: 'My Account', href: '/account' },
   ];
 
@@ -140,8 +141,14 @@ export default function Footer() {
                       </Link>
                     </li>
                   ))}
-                  <li className="pt-2 text-cream/50 text-[11px]">
-                    Support: care@aizora.in
+                  <li className="pt-2 text-cream/70 text-[11px]">
+                    Support:{' '}
+                    <a
+                      href="mailto:aizorastyle@gmail.com"
+                      className="text-tan hover:text-white transition-colors underline underline-offset-2"
+                    >
+                      aizorastyle@gmail.com
+                    </a>
                   </li>
                 </ul>
               )}
@@ -221,8 +228,14 @@ export default function Footer() {
                     </Link>
                   </li>
                 ))}
-                <li className="pt-2 text-cream/50 text-xs">
-                  Support: care@aizora.in
+                <li className="pt-2 text-cream/70 text-xs">
+                  Support:{' '}
+                  <a
+                    href="mailto:aizorastyle@gmail.com"
+                    className="text-tan hover:text-white transition-colors underline underline-offset-2"
+                  >
+                    aizorastyle@gmail.com
+                  </a>
                 </li>
               </ul>
             </div>
@@ -251,9 +264,19 @@ export default function Footer() {
             </div>
           </div>
 
-          {/* Bottom Bar — With Crafted by ekodrix */}
-          <div className="border-t border-white/10 pt-8 flex flex-col sm:flex-row items-center justify-between gap-3 text-xs text-cream/50 font-body text-center sm:text-left">
-            <p>&copy; {new Date().getFullYear()} AIZORA. All rights reserved.</p>
+          {/* Bottom Bar — With Legal Links and Crafted by ekodrix */}
+          <div className="border-t border-white/10 pt-8 flex flex-col sm:flex-row items-center justify-between gap-4 text-xs text-cream/50 font-body text-center sm:text-left">
+            <div className="flex flex-wrap items-center justify-center sm:justify-start gap-x-4 gap-y-1">
+              <p>&copy; {new Date().getFullYear()} AIZORA. All rights reserved.</p>
+              <span className="hidden sm:inline text-white/20">|</span>
+              <Link href="/privacy-policy" className="hover:text-tan transition-colors">
+                Privacy Policy
+              </Link>
+              <span className="text-white/20">•</span>
+              <Link href="/terms-and-conditions" className="hover:text-tan transition-colors">
+                Terms & Conditions
+              </Link>
+            </div>
 
             {/* Crafted by ekodrix link */}
             <p className="flex items-center justify-center gap-1.5 text-xs text-cream/70">

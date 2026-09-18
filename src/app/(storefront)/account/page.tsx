@@ -19,7 +19,7 @@ export default async function AccountPage() {
           <User className="w-16 h-16 text-sand mx-auto mb-4" />
           <h1 className="font-heading text-2xl text-brown-dark mb-2">Welcome to AIZORA</h1>
           <p className="text-sm text-brown-light mb-8">
-            Sign in to access your account, orders, and wishlist.
+            Sign in to access your account and orders.
           </p>
           <p className="text-xs text-brown-light mb-4">
             Account features coming soon. For now, please use the admin panel for management.

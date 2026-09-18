@@ -3,11 +3,10 @@
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import Image from 'next/image';
-import { Heart, Minus, Plus, ShoppingBag, Check, Zap } from 'lucide-react';
+import { Minus, Plus, ShoppingBag, Check, Zap } from 'lucide-react';
 import type { Product } from '@/types/database';
 import { formatPrice, calculateDiscount } from '@/lib/utils';
 import { useCart } from '@/context/CartContext';
-import { useWishlist } from '@/context/WishlistContext';
 
 interface ProductDetailClientProps {
   product: Product;
@@ -77,7 +76,6 @@ export default function ProductDetailClient({ product }: ProductDetailClientProp
   const router = useRouter();
 
   const { addItem, isInCart } = useCart();
-  const { toggleWishlist, isInWishlist } = useWishlist();
 
   const discount = product.compare_at_price
     ? calculateDiscount(product.price, product.compare_at_price)
@@ -364,42 +362,27 @@ export default function ProductDetailClient({ product }: ProductDetailClientProp
               </div>
             )}
 
-            {/* Action Buttons — BUY NOW & Add to Bag */}
+              {/* Action Buttons — BUY NOW & Add to Bag */}
             <div className="space-y-3 mb-8">
-              <div className="flex gap-3">
-                {/* BUY NOW Button with WhatsApp checkout */}
-                <button
-                  onClick={handleBuyNow}
-                  disabled={!inStock}
-                  className={`flex-1 flex items-center justify-center gap-2.5 py-3.5 px-6 text-xs tracking-[0.15em] uppercase font-semibold transition-all duration-300 rounded-xs shadow-md ${
-                    inStock
-                      ? 'bg-bronze hover:bg-bronze-dark text-white cursor-pointer'
-                      : 'bg-sand/70 text-brown-muted cursor-not-allowed border border-border'
-                  }`}
-                >
-                  {inStock ? (
-                    <>
-                      <Zap className="w-4 h-4 fill-white" />
-                      <span>Buy Now</span>
-                    </>
-                  ) : (
-                    <span>Out of Stock</span>
-                  )}
-                </button>
-
-                {/* Wishlist Button */}
-                <button
-                  onClick={() => toggleWishlist(product.id)}
-                  className={`w-12 sm:w-14 flex items-center justify-center border transition-colors rounded-xs ${
-                    isInWishlist(product.id)
-                      ? 'border-bronze bg-bronze/10 text-bronze'
-                      : 'border-border text-brown-dark hover:border-bronze hover:text-bronze bg-white'
-                  }`}
-                  aria-label={isInWishlist(product.id) ? 'Remove from wishlist' : 'Add to wishlist'}
-                >
-                  <Heart className={`w-5 h-5 stroke-[1.5] ${isInWishlist(product.id) ? 'fill-bronze' : ''}`} />
-                </button>
-              </div>
+              {/* BUY NOW Button with WhatsApp checkout */}
+              <button
+                onClick={handleBuyNow}
+                disabled={!inStock}
+                className={`w-full flex items-center justify-center gap-2.5 py-3.5 px-6 text-xs tracking-[0.15em] uppercase font-semibold transition-all duration-300 rounded-xs shadow-md ${
+                  inStock
+                    ? 'bg-bronze hover:bg-bronze-dark text-white cursor-pointer'
+                    : 'bg-sand/70 text-brown-muted cursor-not-allowed border border-border'
+                }`}
+              >
+                {inStock ? (
+                  <>
+                    <Zap className="w-4 h-4 fill-white" />
+                    <span>Buy Now</span>
+                  </>
+                ) : (
+                  <span>Out of Stock</span>
+                )}
+              </button>
 
               {/* Add to Bag Secondary Button */}
               <button

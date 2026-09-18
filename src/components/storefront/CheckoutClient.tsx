@@ -441,7 +441,7 @@ export default function CheckoutClient() {
                       type="email"
                       value={formData.email}
                       onChange={(e) => setFormData({ ...formData, email: e.target.value })}
-                      placeholder="priya@example.com"
+                      placeholder="yourname@gmail.com"
                       className="w-full bg-[#FAF8F5] border border-border rounded-xs px-3.5 py-2.5 text-sm text-brown-dark focus:bg-white focus:outline-none focus:border-bronze focus:ring-1 focus:ring-bronze"
                     />
                   </div>

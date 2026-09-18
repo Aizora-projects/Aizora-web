@@ -2,17 +2,14 @@
 
 import Link from 'next/link';
 import Image from 'next/image';
-import { Heart } from 'lucide-react';
 import type { Product } from '@/types/database';
 import { formatPrice, calculateDiscount } from '@/lib/utils';
-import { useWishlist } from '@/context/WishlistContext';
 
 interface ProductCardProps {
   product: Product;
 }
 
 export default function ProductCard({ product }: ProductCardProps) {
-  const { toggleWishlist, isInWishlist } = useWishlist();
   const primaryImage = product.images?.find((img) => img.is_primary) || product.images?.[0];
   const discount = product.compare_at_price
     ? calculateDiscount(product.price, product.compare_at_price)
@@ -41,8 +38,8 @@ export default function ProductCard({ product }: ProductCardProps) {
           </div>
         )}
 
-        {/* Badges — Refined, Minimalist Luxury Badges */}
-        <div className="absolute top-2.5 left-2.5 flex flex-wrap items-center gap-1 max-w-[85%] z-10 pointer-events-none">
+        {/* Badges — Positioned at Bottom Right of Image */}
+        <div className="absolute bottom-2.5 right-2.5 flex flex-wrap items-center justify-end gap-1 max-w-[85%] z-10 pointer-events-none">
           {isOutOfStock ? (
             <span className="px-2.5 py-0.5 rounded-full text-[8.5px] uppercase font-bold tracking-wider bg-stone-900/90 text-white backdrop-blur-xs shadow-xs">
               Sold Out
@@ -76,25 +73,6 @@ export default function ProductCard({ product }: ProductCardProps) {
             </>
           )}
         </div>
-
-        {/* Wishlist Button */}
-        <button
-          onClick={(e) => {
-            e.preventDefault();
-            e.stopPropagation();
-            toggleWishlist(product.id);
-          }}
-          className="absolute top-2.5 right-2.5 w-8 h-8 rounded-full bg-white/80 backdrop-blur-xs flex items-center justify-center hover:bg-white transition-all shadow-xs"
-          aria-label={isInWishlist(product.id) ? 'Remove from wishlist' : 'Add to wishlist'}
-        >
-          <Heart
-            className={`w-4 h-4 transition-colors stroke-[1.5] ${
-              isInWishlist(product.id)
-                ? 'fill-bronze text-bronze'
-                : 'text-brown-dark/70 hover:text-bronze'
-            }`}
-          />
-        </button>
       </Link>
 
       {/* Product Info */}

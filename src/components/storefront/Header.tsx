@@ -3,9 +3,8 @@
 import { useState, useRef, useEffect } from 'react';
 import Link from 'next/link';
 import Image from 'next/image';
-import { Search, Heart, ShoppingBag, Menu, X, ChevronDown, ArrowRight, Sparkles } from 'lucide-react';
+import { Search, ShoppingBag, Menu, X, ChevronDown, ArrowRight, Sparkles } from 'lucide-react';
 import { useCart } from '@/context/CartContext';
-import { useWishlist } from '@/context/WishlistContext';
 
 const collectionCategories = [
   { label: 'Cotton Set', href: '/category/cotton', description: 'Everyday Breathable Elegance' },
@@ -23,7 +22,6 @@ export default function Header() {
   const [isMobileCollectionsOpen, setIsMobileCollectionsOpen] = useState(true);
   const [searchQuery, setSearchQuery] = useState('');
   const { itemCount: cartCount } = useCart();
-  const { itemCount: wishlistCount } = useWishlist();
 
   const handleSearch = (e: React.FormEvent) => {
     e.preventDefault();
@@ -175,18 +173,7 @@ export default function Header() {
                 <Search className="w-5 h-5 stroke-[1.6]" />
               </button>
 
-              <Link
-                href="/wishlist"
-                className="p-1.5 lg:p-2 text-brown-dark hover:text-tan transition-colors relative"
-                aria-label="Wishlist"
-              >
-                <Heart className="w-5 h-5 stroke-[1.6]" />
-                {wishlistCount > 0 && (
-                  <span className="absolute 0 top-0.5 right-0.5 bg-tan text-white text-[9px] w-3.5 h-3.5 rounded-full flex items-center justify-center font-medium">
-                    {wishlistCount}
-                  </span>
-                )}
-              </Link>
+
 
               <Link
                 href="/cart"
@@ -335,13 +322,7 @@ export default function Header() {
                 >
                   My Profile & Orders
                 </Link>
-                <Link
-                  href="/wishlist"
-                  onClick={() => setIsMobileMenuOpen(false)}
-                  className="block text-sm text-brown-light hover:text-brown-dark transition-colors"
-                >
-                  My Wishlist ({wishlistCount})
-                </Link>
+
               </div>
             </nav>
 

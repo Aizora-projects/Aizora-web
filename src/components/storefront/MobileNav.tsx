@@ -1,23 +1,21 @@
 'use client';
 
 import Link from 'next/link';
-import { Home, Grid3X3, Search, Heart, ShoppingBag } from 'lucide-react';
+import { Home, Grid3X3, Search, Sparkles, ShoppingBag } from 'lucide-react';
 import { usePathname } from 'next/navigation';
 import { useCart } from '@/context/CartContext';
-import { useWishlist } from '@/context/WishlistContext';
 
 const navItems = [
   { label: 'Home', href: '/', icon: Home },
-  { label: 'Categories', href: '/shop', icon: Grid3X3 },
+  { label: 'Shop', href: '/shop', icon: Grid3X3 },
+  { label: 'Offers', href: '/offers', icon: Sparkles },
   { label: 'Search', href: '/search', icon: Search },
-  { label: 'Wishlist', href: '/wishlist', icon: Heart },
   { label: 'Bag', href: '/cart', icon: ShoppingBag },
 ];
 
 export default function MobileNav() {
   const pathname = usePathname();
   const { itemCount: cartCount } = useCart();
-  const { itemCount: wishlistCount } = useWishlist();
 
   return (
     <nav className="fixed bottom-0 left-0 right-0 bg-white border-t border-border z-50 lg:hidden safe-area-bottom">
@@ -25,7 +23,7 @@ export default function MobileNav() {
         {navItems.map((item) => {
           const isActive = pathname === item.href;
           const Icon = item.icon;
-          const count = item.label === 'Bag' ? cartCount : item.label === 'Wishlist' ? wishlistCount : 0;
+          const count = item.label === 'Bag' ? cartCount : 0;
 
           return (
             <Link
