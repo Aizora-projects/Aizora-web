@@ -4,20 +4,14 @@ import { useState } from 'react';
 import Image from 'next/image';
 import Link from 'next/link';
 import { loginAdmin } from '@/actions/auth';
-import { Eye, EyeOff, Loader2, Shield, Key, ArrowLeft } from 'lucide-react';
+import { Eye, EyeOff, Loader2, Shield, ArrowLeft } from 'lucide-react';
 
 export default function AdminLoginPage() {
-  const [email, setEmail] = useState('admin@aizora.in');
-  const [password, setPassword] = useState('Admin@Aizora2026!');
+  const [email, setEmail] = useState('');
+  const [password, setPassword] = useState('');
   const [showPassword, setShowPassword] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [isLoading, setIsLoading] = useState(false);
-
-  const fillCredentials = () => {
-    setEmail('admin@aizora.in');
-    setPassword('Admin@Aizora2026!');
-    setError(null);
-  };
 
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
@@ -63,20 +57,11 @@ export default function AdminLoginPage() {
 
         {/* Login Card */}
         <div className="bg-white border border-[#E8DFD3] rounded-2xl p-7 sm:p-9 shadow-md space-y-6">
-          <div className="flex items-center justify-between pb-4 border-b border-[#F0EAE1]">
+          <div className="pb-4 border-b border-[#F0EAE1]">
             <h2 className="text-xs tracking-[0.18em] uppercase text-stone-900 font-bold flex items-center gap-2">
               <Shield className="w-4 h-4 text-tan" />
               <span>Sign In to Dashboard</span>
             </h2>
-            <button
-              type="button"
-              onClick={fillCredentials}
-              className="text-[11px] text-tan hover:text-tan-dark font-medium flex items-center gap-1 transition-colors px-2 py-1 rounded bg-[#FAF7F2] border border-[#EAE3D8]"
-              title="Click to fill default credentials"
-            >
-              <Key className="w-3 h-3" />
-              <span>Auto-Fill</span>
-            </button>
           </div>
 
           {error && (
@@ -150,16 +135,7 @@ export default function AdminLoginPage() {
             </button>
           </form>
 
-          {/* Credentials Info */}
-          <div className="pt-4 border-t border-[#F0EAE1] text-[11px] text-stone-500 space-y-1">
-            <p className="font-semibold text-stone-700">Configured Admin Account:</p>
-            <p>
-              Email: <code className="text-tan font-mono font-medium">admin@aizora.in</code>
-            </p>
-            <p>
-              Password: <code className="text-tan font-mono font-medium">Admin@Aizora2026!</code>
-            </p>
-          </div>
+
         </div>
 
         {/* Back to store */}
