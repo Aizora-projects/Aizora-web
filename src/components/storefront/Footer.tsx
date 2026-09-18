@@ -65,14 +65,25 @@ export default function Footer() {
           {/* Brand Column — Always Visible */}
           <div className="mb-8 md:mb-12">
             <div className="mb-4">
-              <Image
-                src="/Aizora-logo.png"
-                alt="AIZORA"
-                width={150}
-                height={50}
-                className="h-10 w-auto object-contain brightness-0 invert opacity-90"
-                unoptimized
-              />
+              <Link
+                href="/"
+                className="inline-block group cursor-pointer"
+                aria-label="AIZORA Home"
+                onClick={() => {
+                  if (typeof window !== 'undefined' && window.location.pathname === '/') {
+                    window.scrollTo({ top: 0, behavior: 'smooth' });
+                  }
+                }}
+              >
+                <Image
+                  src="/Aizora-logo.png"
+                  alt="AIZORA"
+                  width={150}
+                  height={50}
+                  className="h-10 w-auto object-contain brightness-0 invert opacity-90 transition-opacity group-hover:opacity-100"
+                  unoptimized
+                />
+              </Link>
             </div>
             <p className="text-sm leading-relaxed text-cream/60 font-body max-w-md">
               Curated premium women&apos;s fashion for every expression. Timeless elegance, modern confidence.

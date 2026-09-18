@@ -3,6 +3,7 @@
 import { useState, useRef, useEffect } from 'react';
 import Link from 'next/link';
 import Image from 'next/image';
+import { usePathname, useRouter } from 'next/navigation';
 import { Search, ShoppingBag, Menu, X, ChevronDown, ArrowRight, Sparkles } from 'lucide-react';
 import { useCart } from '@/context/CartContext';
 
@@ -22,6 +23,18 @@ export default function Header() {
   const [isMobileCollectionsOpen, setIsMobileCollectionsOpen] = useState(true);
   const [searchQuery, setSearchQuery] = useState('');
   const { itemCount: cartCount } = useCart();
+  const pathname = usePathname();
+  const router = useRouter();
+
+  const handleLogoClick = (e?: React.MouseEvent) => {
+    setIsMobileMenuOpen(false);
+    if (pathname === '/') {
+      if (e) e.preventDefault();
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+      // Full refresh to top of home page
+      window.location.href = '/';
+    }
+  };
 
   const handleSearch = (e: React.FormEvent) => {
     e.preventDefault();
@@ -55,13 +68,18 @@ export default function Header() {
             </div>
 
             {/* Logo — Desktop Left, Mobile Center */}
-            <Link href="/" className="flex items-center flex-shrink-0">
+            <Link
+              href="/"
+              onClick={handleLogoClick}
+              className="flex items-center flex-shrink-0 group cursor-pointer"
+              aria-label="AIZORA Home"
+            >
               <Image
                 src="/Aizora-logo.png"
                 alt="AIZORA — Wear Your Elegance"
                 width={170}
                 height={56}
-                className="h-9 md:h-11 lg:h-13 w-auto object-contain"
+                className="h-9 md:h-11 lg:h-13 w-auto object-contain transition-opacity group-hover:opacity-90"
                 priority
                 unoptimized
               />
@@ -227,14 +245,21 @@ export default function Header() {
           />
           <div className="absolute left-0 top-0 bottom-0 w-80 max-w-[85vw] bg-ivory animate-slide-down shadow-2xl flex flex-col z-10 border-r border-border">
             <div className="flex items-center justify-between p-5 border-b border-border">
-              <Image
-                src="/Aizora-logo.png"
-                alt="AIZORA"
-                width={130}
-                height={42}
-                className="h-8 w-auto object-contain"
-                unoptimized
-              />
+              <Link
+                href="/"
+                onClick={handleLogoClick}
+                className="flex items-center group cursor-pointer"
+                aria-label="AIZORA Home"
+              >
+                <Image
+                  src="/Aizora-logo.png"
+                  alt="AIZORA"
+                  width={130}
+                  height={42}
+                  className="h-8 w-auto object-contain transition-opacity group-hover:opacity-90"
+                  unoptimized
+                />
+              </Link>
               <button
                 onClick={() => setIsMobileMenuOpen(false)}
                 className="p-1.5 text-brown-dark hover:text-tan transition-colors"
