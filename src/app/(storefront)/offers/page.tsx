@@ -1,6 +1,6 @@
 import { Metadata } from 'next';
 import Link from 'next/link';
-import { ChevronRight, Sparkles, ArrowRight, Tag } from 'lucide-react';
+import { ChevronRight, ArrowRight, Tag } from 'lucide-react';
 import { getProducts } from '@/actions/products';
 import ProductCard from '@/components/storefront/ProductCard';
 import ShopSort from '@/components/storefront/ShopSort';
@@ -114,7 +114,7 @@ export default async function OffersPage({ searchParams }: OffersPageProps) {
           /* Empty State */
           <div className="text-center py-16 sm:py-24 bg-white/60 border border-border/70 rounded-md p-8 sm:p-12">
             <div className="w-16 h-16 rounded-full bg-cream border border-border flex items-center justify-center mx-auto mb-5 text-tan">
-              <Sparkles className="w-7 h-7" />
+              <Tag className="w-7 h-7" />
             </div>
             <h2 className="font-heading text-xl sm:text-2xl font-semibold uppercase tracking-wider text-brown-dark mb-2">
               No Offers Currently Active

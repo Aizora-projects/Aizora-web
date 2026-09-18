@@ -1,14 +1,14 @@
 'use client';
 
 import Link from 'next/link';
-import { Home, Grid3X3, Search, Sparkles, ShoppingBag } from 'lucide-react';
+import { Home, Grid3X3, Search, Tag, ShoppingBag } from 'lucide-react';
 import { usePathname } from 'next/navigation';
 import { useCart } from '@/context/CartContext';
 
 const navItems = [
   { label: 'Home', href: '/', icon: Home },
   { label: 'Shop', href: '/shop', icon: Grid3X3 },
-  { label: 'Offers', href: '/offers', icon: Sparkles },
+  { label: 'Offers', href: '/offers', icon: Tag },
   { label: 'Search', href: '/search', icon: Search },
   { label: 'Bag', href: '/cart', icon: ShoppingBag },
 ];

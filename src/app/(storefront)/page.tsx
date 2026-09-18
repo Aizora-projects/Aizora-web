@@ -4,7 +4,7 @@ import ProductCard from '@/components/storefront/ProductCard';
 import Link from 'next/link';
 import { getCategories } from '@/actions/categories';
 import { getProducts } from '@/actions/products';
-import { ArrowRight, Sparkles } from 'lucide-react';
+import { ArrowRight } from 'lucide-react';
 
 export const dynamic = 'force-dynamic';
 
@@ -34,8 +34,7 @@ export default async function HomePage() {
             {/* Section Header */}
             <div className="flex items-center justify-between mb-8 lg:mb-12">
               <div>
-                <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-tan/15 text-tan text-[10px] tracking-[0.2em] uppercase font-bold mb-2">
-                  <Sparkles className="w-3 h-3 text-tan" />
+                <div className="inline-flex items-center px-3 py-1 rounded-full bg-tan/15 text-tan text-[10px] tracking-[0.2em] uppercase font-bold mb-2">
                   <span>Customer Favorites</span>
                 </div>
                 <h2 className="font-heading text-xl sm:text-2xl lg:text-3xl tracking-[0.18em] uppercase text-brown-dark font-medium">

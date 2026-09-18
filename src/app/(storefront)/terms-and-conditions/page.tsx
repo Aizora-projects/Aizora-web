@@ -1,6 +1,6 @@
 import { Metadata } from 'next';
 import Link from 'next/link';
-import { FileText, CheckCircle2, Truck, RefreshCw, AlertCircle, Mail, Sparkles } from 'lucide-react';
+import { FileText, CheckCircle2, Truck, RefreshCw, AlertCircle, Mail, ShieldCheck } from 'lucide-react';
 
 export const metadata: Metadata = {
   title: 'Terms & Conditions | AIZORA Luxury Fashion',
@@ -60,7 +60,7 @@ export default function TermsAndConditionsPage() {
           <section className="bg-white/80 border border-border/70 rounded-xs p-6 sm:p-8 shadow-xs">
             <div className="flex items-center gap-3 mb-4">
               <div className="w-9 h-9 rounded-full bg-cream flex items-center justify-center text-bronze flex-shrink-0">
-                <Sparkles className="w-5 h-5 stroke-[1.8]" />
+                <ShieldCheck className="w-5 h-5 stroke-[1.8]" />
               </div>
               <h2 className="font-heading text-lg sm:text-xl font-bold tracking-wide uppercase text-brown-dark">
                 2. Products, Fabric Authenticity & Imagery

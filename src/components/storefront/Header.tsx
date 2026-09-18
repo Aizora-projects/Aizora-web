@@ -4,7 +4,7 @@ import { useState, useRef, useEffect } from 'react';
 import Link from 'next/link';
 import Image from 'next/image';
 import { usePathname, useRouter } from 'next/navigation';
-import { Search, ShoppingBag, Menu, X, ChevronDown, ArrowRight, Sparkles } from 'lucide-react';
+import { Search, ShoppingBag, Menu, X, ChevronDown, ArrowRight } from 'lucide-react';
 import { useCart } from '@/context/CartContext';
 
 const collectionCategories = [
