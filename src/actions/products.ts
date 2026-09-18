@@ -16,6 +16,7 @@ export async function getProducts(options?: {
   isFeatured?: boolean;
   isNew?: boolean;
   isOffer?: boolean;
+  isBestseller?: boolean;
   search?: string;
   orderBy?: string;
   orderDir?: 'asc' | 'desc';
@@ -29,9 +30,22 @@ export async function getProducts(options?: {
     isFeatured,
     isNew,
     isOffer,
+    isBestseller,
     search,
     orderBy = 'created_at',
     orderDir = 'desc',
+  }: {
+    page?: number;
+    pageSize?: number;
+    categoryId?: string;
+    isActive?: boolean;
+    isFeatured?: boolean;
+    isNew?: boolean;
+    isOffer?: boolean;
+    isBestseller?: boolean;
+    search?: string;
+    orderBy?: string;
+    orderDir?: 'asc' | 'desc';
   } = options || {};
 
   // If filtering for offer items, resolve product IDs tagged with offer variant
@@ -62,6 +76,7 @@ export async function getProducts(options?: {
   if (categoryId) query = query.eq('category_id', categoryId);
   if (isActive !== undefined) query = query.eq('is_active', isActive);
   if (isFeatured !== undefined) query = query.eq('is_featured', isFeatured);
+  if (isBestseller !== undefined) query = query.eq('is_featured', isBestseller);
   if (isNew !== undefined) query = query.eq('is_new', isNew);
   if (search) query = query.ilike('name', `%${search}%`);
 
@@ -86,6 +101,7 @@ export async function getProducts(options?: {
   const mapped = ((data as unknown as Product[]) || []).map((p) => ({
     ...p,
     is_offer: p.variants?.some((v) => v.name.toLowerCase() === 'offer') ?? false,
+    is_bestseller: p.is_featured || (p.variants?.some((v) => v.name.toLowerCase() === 'bestseller') ?? false),
   }));
 
   return {
@@ -109,6 +125,7 @@ export async function getProductBySlug(slug: string) {
   if (error || !data) return null;
   const prod = data as unknown as Product;
   prod.is_offer = prod.variants?.some((v) => v.name.toLowerCase() === 'offer') ?? false;
+  prod.is_bestseller = prod.is_featured || (prod.variants?.some((v) => v.name.toLowerCase() === 'bestseller') ?? false);
   return prod;
 }
 
@@ -124,6 +141,7 @@ export async function getProductById(id: string) {
   if (error || !data) return null;
   const prod = data as unknown as Product;
   prod.is_offer = prod.variants?.some((v) => v.name.toLowerCase() === 'offer') ?? false;
+  prod.is_bestseller = prod.is_featured || (prod.variants?.some((v) => v.name.toLowerCase() === 'bestseller') ?? false);
   return prod;
 }
 
@@ -131,7 +149,11 @@ export async function createProduct(formData: Record<string, unknown>) {
   const user = await verifyAdmin();
   if (!user) return { error: 'Unauthorized: Admin privileges required' };
 
-  const { sizes, colors, is_offer, ...productFields } = formData;
+  const { sizes, colors, is_offer, is_bestseller, ...productFields } = formData;
+
+  if (is_bestseller !== undefined) {
+    productFields.is_featured = is_bestseller === true || is_bestseller === 'true';
+  }
 
   if (!productFields.slug && typeof productFields.name === 'string') {
     productFields.slug = slugify(productFields.name);
@@ -164,6 +186,16 @@ export async function createProduct(formData: Record<string, unknown>) {
     variantsToInsert.push({
       product_id: data.id,
       name: 'offer',
+      value: 'true',
+      price_modifier: 0,
+      stock: data.stock,
+    });
+  }
+
+  if (is_bestseller === true || is_bestseller === 'true') {
+    variantsToInsert.push({
+      product_id: data.id,
+      name: 'bestseller',
       value: 'true',
       price_modifier: 0,
       stock: data.stock,
@@ -214,7 +246,11 @@ export async function updateProduct(id: string, formData: Record<string, unknown
   const user = await verifyAdmin();
   if (!user) return { error: 'Unauthorized: Admin privileges required' };
 
-  const { sizes, colors, is_offer, ...productFields } = formData;
+  const { sizes, colors, is_offer, is_bestseller, ...productFields } = formData;
+
+  if (is_bestseller !== undefined) {
+    productFields.is_featured = is_bestseller === true || is_bestseller === 'true';
+  }
 
   if (!productFields.slug && typeof productFields.name === 'string') {
     productFields.slug = slugify(productFields.name);
@@ -250,6 +286,16 @@ export async function updateProduct(id: string, formData: Record<string, unknown
     variantsToInsert.push({
       product_id: id,
       name: 'offer',
+      value: 'true',
+      price_modifier: 0,
+      stock: data.stock,
+    });
+  }
+
+  if (is_bestseller === true || is_bestseller === 'true') {
+    variantsToInsert.push({
+      product_id: id,
+      name: 'bestseller',
       value: 'true',
       price_modifier: 0,
       stock: data.stock,

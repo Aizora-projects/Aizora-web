@@ -44,6 +44,7 @@ export default function ProductForm({ product, categories }: ProductFormProps) {
     is_featured: product?.is_featured ?? false,
     is_new: product?.is_new ?? true,
     is_offer: product?.variants?.some((v) => v.name.toLowerCase() === 'offer') ?? false,
+    is_bestseller: product?.is_bestseller ?? product?.is_featured ?? (product?.variants?.some((v) => v.name.toLowerCase() === 'bestseller') ?? false),
   });
 
   const [images, setImages] = useState<ProductImage[]>(
@@ -860,9 +861,9 @@ export default function ProductForm({ product, categories }: ProductFormProps) {
 
             {[
               { key: 'is_active', label: 'Published / Live in Store' },
-              { key: 'is_offer', label: 'Offer Item (Show in Offer Items Page)' },
-              { key: 'is_featured', label: 'Featured on Homepage' },
+              { key: 'is_bestseller', label: 'Best Seller (Feature in Best Sellers Section)' },
               { key: 'is_new', label: 'New Arrival Ribbon' },
+              { key: 'is_offer', label: 'Offer Item (Show in Offer Items Page)' },
             ].map((toggle) => (
               <label
                 key={toggle.key}

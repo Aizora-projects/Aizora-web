@@ -26,6 +26,7 @@ export default async function ShopPage({ searchParams }: ShopPageProps) {
     categoryId: category,
     isNew: filter === 'new' ? true : undefined,
     isFeatured: filter === 'featured' ? true : undefined,
+    isBestseller: filter === 'bestseller' ? true : undefined,
     page,
     pageSize: 12,
     orderBy: sort === 'price-low' || sort === 'price-high' ? 'price' : 'created_at',
@@ -47,7 +48,7 @@ export default async function ShopPage({ searchParams }: ShopPageProps) {
       <div className="bg-cream py-10 lg:py-14 mb-8">
         <div className="max-w-7xl mx-auto px-4 lg:px-8 text-center">
           <h1 className="font-heading text-3xl lg:text-4xl font-bold tracking-[0.1em] uppercase text-brown-dark mb-2">
-            {filter === 'new' ? 'New Arrivals' : filter === 'featured' ? 'Featured' : 'Shop All'}
+            {filter === 'new' ? 'New Arrivals' : filter === 'bestseller' ? 'Best Sellers' : filter === 'featured' ? 'Featured' : 'Shop All'}
           </h1>
           <p className="text-sm text-brown-light">
             Discover our curated collection of premium women&apos;s fashion

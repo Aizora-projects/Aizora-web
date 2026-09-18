@@ -17,6 +17,7 @@ export default function ProductCard({ product }: ProductCardProps) {
 
   const isOutOfStock = product.stock <= 0;
   const isOffer = product.is_offer || product.variants?.some((v) => v.name.toLowerCase() === 'offer');
+  const isBestSeller = product.is_bestseller || product.is_featured || product.variants?.some((v) => v.name.toLowerCase() === 'bestseller');
 
   return (
     <div className="group relative">
@@ -58,6 +59,11 @@ export default function ProductCard({ product }: ProductCardProps) {
                 </span>
               ) : (
                 <>
+                  {isBestSeller && (
+                    <span className="px-2 py-0.5 rounded-full text-[8.5px] uppercase font-bold tracking-wider bg-tan/95 text-white backdrop-blur-xs shadow-2xs">
+                      Best Seller
+                    </span>
+                  )}
                   {product.is_new && (
                     <span className="px-2 py-0.5 rounded-full text-[8.5px] uppercase font-bold tracking-wider bg-white/95 text-stone-900 border border-stone-200/80 backdrop-blur-xs shadow-2xs">
                       New

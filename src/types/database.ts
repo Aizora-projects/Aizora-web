@@ -56,6 +56,7 @@ export interface Product {
   images?: ProductImage[];
   variants?: ProductVariant[];
   is_offer?: boolean;
+  is_bestseller?: boolean;
 }
 
 export interface ProductImage {

@@ -121,6 +121,7 @@ export default function ProductDetailClient({ product }: ProductDetailClientProp
   const variantInfo = variantParts.length > 0 ? variantParts.join(', ') : undefined;
 
   const isOffer = product.is_offer || product.variants?.some((v) => v.name.toLowerCase() === 'offer');
+  const isBestSeller = product.is_bestseller || product.is_featured || product.variants?.some((v) => v.name.toLowerCase() === 'bestseller');
 
   return (
     <>
@@ -165,6 +166,11 @@ export default function ProductDetailClient({ product }: ProductDetailClientProp
                       </span>
                     ) : (
                       <>
+                        {isBestSeller && (
+                          <span className="px-2.5 py-1 rounded-full text-[9px] sm:text-[10px] uppercase font-bold tracking-wider bg-tan text-white backdrop-blur-xs shadow-2xs">
+                            Best Seller
+                          </span>
+                        )}
                         {product.is_new && (
                           <span className="px-2.5 py-1 rounded-full text-[9px] sm:text-[10px] uppercase font-bold tracking-wider bg-white/95 text-stone-900 border border-stone-200/80 backdrop-blur-xs shadow-2xs">
                             New
