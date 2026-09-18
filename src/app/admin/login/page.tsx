@@ -85,8 +85,7 @@ export default function AdminLoginPage() {
                 required
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
-                className="w-full bg-[#FAF7F2] border border-[#E2D9CC] rounded-lg px-4 py-3 text-sm text-stone-900 placeholder-stone-400 focus:outline-none focus:border-tan focus:bg-white transition-colors"
-                placeholder="admin@aizora.in"
+                className="w-full bg-[#FAF7F2] border border-[#E2D9CC] rounded-lg px-4 py-3 text-sm text-stone-900 focus:outline-none focus:border-tan focus:bg-white transition-colors"
               />
             </div>
 
@@ -105,8 +104,7 @@ export default function AdminLoginPage() {
                   required
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
-                  className="w-full bg-[#FAF7F2] border border-[#E2D9CC] rounded-lg px-4 py-3 pr-10 text-sm text-stone-900 placeholder-stone-400 focus:outline-none focus:border-tan focus:bg-white transition-colors"
-                  placeholder="Enter admin password"
+                  className="w-full bg-[#FAF7F2] border border-[#E2D9CC] rounded-lg px-4 py-3 pr-10 text-sm text-stone-900 focus:outline-none focus:border-tan focus:bg-white transition-colors"
                 />
                 <button
                   type="button"
