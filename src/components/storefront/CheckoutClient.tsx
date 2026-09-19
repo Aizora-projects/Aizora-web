@@ -13,7 +13,7 @@ import {
   MessageCircle,
   Loader2,
   CreditCard,
-  Banknote,
+  MapPin,
   Package,
   ChevronRight,
   ExternalLink,
@@ -70,7 +70,7 @@ export default function CheckoutClient() {
     state: 'Maharashtra',
     pincode: '',
     notes: '',
-    paymentMethod: 'cod', // 'cod' | 'whatsapp_pay'
+    paymentMethod: 'prepaid',
   });
 
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -153,12 +153,7 @@ export default function CheckoutClient() {
                 <div>
                   <p className="font-semibold text-brown-dark mb-1">Payment & Shipping</p>
                   <p>
-                    Payment Mode:{' '}
-                    <strong>
-                      {orderResult.placedData.paymentMethod === 'cod'
-                        ? 'Cash on Delivery (COD)'
-                        : 'WhatsApp Pay / UPI'}
-                    </strong>
+                    Payment Mode: <strong>Prepaid (UPI / WhatsApp Pay)</strong>
                   </p>
                   <p>Shipping: Complimentary Pan-India Delivery</p>
                   <p className="mt-2 text-sm font-bold text-brown-dark">
@@ -299,7 +294,7 @@ export default function CheckoutClient() {
         shipping_city: formData.city,
         shipping_state: formData.state || 'India',
         shipping_pincode: formData.pincode,
-        notes: `[Payment Method: ${formData.paymentMethod === 'cod' ? 'Cash on Delivery (COD)' : 'WhatsApp Pay / UPI'}] ${formData.notes || ''}`.trim(),
+        notes: `[Prepaid via WhatsApp / UPI] ${formData.notes || ''}`.trim(),
         items: orderItemsForAction,
       });
 
@@ -382,9 +377,7 @@ export default function CheckoutClient() {
               {/* Delivery Information Card */}
               <div className="bg-white border border-border rounded-sm p-6 sm:p-7 shadow-xs space-y-5">
                 <div className="flex items-center gap-2 pb-3 border-b border-border/80">
-                  <div className="w-7 h-7 rounded-full bg-bronze/10 text-bronze flex items-center justify-center font-bold text-xs">
-                    1
-                  </div>
+                  <MapPin className="w-4 h-4 text-bronze flex-shrink-0" />
                   <h2 className="font-heading text-sm tracking-[0.12em] uppercase font-bold text-brown-dark">
                     Delivery Address
                   </h2>
@@ -531,84 +524,6 @@ export default function CheckoutClient() {
                 </div>
               </div>
 
-              {/* Payment Method Card */}
-              <div className="bg-white border border-border rounded-sm p-6 sm:p-7 shadow-xs space-y-4">
-                <div className="flex items-center gap-2 pb-3 border-b border-border/80">
-                  <div className="w-7 h-7 rounded-full bg-bronze/10 text-bronze flex items-center justify-center font-bold text-xs">
-                    2
-                  </div>
-                  <h2 className="font-heading text-sm tracking-[0.12em] uppercase font-bold text-brown-dark">
-                    Payment Method
-                  </h2>
-                </div>
-
-                <div className="space-y-3">
-                  {/* COD */}
-                  <label
-                    className={`flex items-start gap-3 p-4 border rounded-sm cursor-pointer transition-all ${
-                      formData.paymentMethod === 'cod'
-                        ? 'border-brown-dark bg-cream/40 shadow-2xs'
-                        : 'border-border bg-white hover:border-bronze'
-                    }`}
-                  >
-                    <input
-                      type="radio"
-                      name="paymentMethod"
-                      value="cod"
-                      checked={formData.paymentMethod === 'cod'}
-                      onChange={() => setFormData({ ...formData, paymentMethod: 'cod' })}
-                      className="mt-0.5 text-brown-dark focus:ring-bronze"
-                    />
-                    <div className="flex-1">
-                      <div className="flex items-center justify-between">
-                        <span className="text-xs font-bold uppercase tracking-wider text-brown-dark flex items-center gap-1.5">
-                          <Banknote className="w-4 h-4 text-emerald-600" />
-                          Cash on Delivery (COD)
-                        </span>
-                        <span className="text-[10px] font-bold uppercase tracking-wider px-2 py-0.5 bg-emerald-50 text-emerald-700 rounded-full border border-emerald-200">
-                          Popular
-                        </span>
-                      </div>
-                      <p className="text-xs text-brown-light mt-1">
-                        Pay with cash or UPI QR code at your doorstep upon package arrival.
-                      </p>
-                    </div>
-                  </label>
-
-                  {/* WhatsApp Pay / UPI */}
-                  <label
-                    className={`flex items-start gap-3 p-4 border rounded-sm cursor-pointer transition-all ${
-                      formData.paymentMethod === 'whatsapp_pay'
-                        ? 'border-brown-dark bg-cream/40 shadow-2xs'
-                        : 'border-border bg-white hover:border-bronze'
-                    }`}
-                  >
-                    <input
-                      type="radio"
-                      name="paymentMethod"
-                      value="whatsapp_pay"
-                      checked={formData.paymentMethod === 'whatsapp_pay'}
-                      onChange={() => setFormData({ ...formData, paymentMethod: 'whatsapp_pay' })}
-                      className="mt-0.5 text-brown-dark focus:ring-bronze"
-                    />
-                    <div className="flex-1">
-                      <div className="flex items-center justify-between">
-                        <span className="text-xs font-bold uppercase tracking-wider text-brown-dark flex items-center gap-1.5">
-                          <MessageCircle className="w-4 h-4 text-[#25D366] fill-[#25D366]" />
-                          WhatsApp Pay / UPI Quick Pay
-                        </span>
-                        <span className="text-[10px] font-bold uppercase tracking-wider px-2 py-0.5 bg-blue-50 text-blue-700 rounded-full border border-blue-200">
-                          Instant
-                        </span>
-                      </div>
-                      <p className="text-xs text-brown-light mt-1">
-                        Receive instant UPI payment details directly on WhatsApp for 1-click confirmation.
-                      </p>
-                    </div>
-                  </label>
-                </div>
-              </div>
-
               {/* Guarantees */}
               <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 pt-1">
                 <div className="flex items-center gap-2 p-3 bg-white border border-border/80 rounded-sm">
@@ -620,8 +535,8 @@ export default function CheckoutClient() {
                   <span className="text-[11px] font-semibold text-brown-dark">100% Quality Inspected</span>
                 </div>
                 <div className="flex items-center gap-2 p-3 bg-white border border-border/80 rounded-sm">
-                  <Package className="w-4 h-4 text-bronze flex-shrink-0" />
-                  <span className="text-[11px] font-semibold text-brown-dark">Secure Luxury Box</span>
+                  <CreditCard className="w-4 h-4 text-bronze flex-shrink-0" />
+                  <span className="text-[11px] font-semibold text-brown-dark">100% Prepaid via UPI</span>
                 </div>
               </div>
             </div>
@@ -692,6 +607,12 @@ export default function CheckoutClient() {
                       FREE
                     </span>
                   </div>
+                  <div className="flex justify-between">
+                    <span>Payment Mode</span>
+                    <span className="font-semibold text-brown-dark uppercase tracking-wider text-[11px]">
+                      Prepaid (UPI)
+                    </span>
+                  </div>
                   <div className="border-t border-border/80 pt-3 flex justify-between text-sm font-bold text-brown-dark">
                     <span>Total Amount</span>
                     <span className="text-base text-bronze">{formatPrice(total)}</span>
@@ -718,7 +639,7 @@ export default function CheckoutClient() {
                 </button>
 
                 <p className="text-[11px] text-center text-brown-light/80 leading-tight">
-                  By clicking Place Order, your order will be registered and a WhatsApp confirmation will open.
+                  By clicking Place Order, your order will be registered and instant UPI payment details will open on WhatsApp.
                 </p>
               </div>
 

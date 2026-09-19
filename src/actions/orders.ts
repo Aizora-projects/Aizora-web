@@ -155,7 +155,7 @@ export async function createWhatsAppOrder(input: CreateOrderInput) {
 
     message += `\n*💰 Order Total:* ₹${total.toLocaleString('en-IN')}\n`;
     message += `*🚚 Shipping:* Free Pan India Delivery\n`;
-    message += `*💵 Payment:* Cash on Delivery (COD) / WhatsApp Pay\n`;
+    message += `*💵 Payment:* Prepaid (UPI / WhatsApp Pay)\n`;
     message += `──────────────────\n`;
     message += `*👤 Delivery Details:*\n`;
     message += `*Name:* ${customer_name.trim()}\n`;

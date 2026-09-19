@@ -109,7 +109,7 @@ export default function WhatsAppCheckoutModal({
                 Express Checkout
               </h3>
               <p className="text-[11px] text-brown-light font-body">
-                Order via WhatsApp with Cash on Delivery / UPI
+                Prepaid Order via WhatsApp (UPI / GPay / PhonePe)
               </p>
             </div>
           </div>
@@ -322,7 +322,7 @@ export default function WhatsAppCheckoutModal({
                   Free Pan India Delivery
                 </span>
                 <span>•</span>
-                <span>Pay on Delivery / UPI</span>
+                <span>Prepaid via UPI / WhatsApp</span>
                 <span>•</span>
                 <span>Instant Confirmation</span>
               </div>
