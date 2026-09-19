@@ -15,7 +15,11 @@ export default function ProductCard({ product }: ProductCardProps) {
     ? calculateDiscount(product.price, product.compare_at_price)
     : 0;
 
-  const isOutOfStock = product.stock <= 0;
+  const sizeVariants = product.variants?.filter((v) => v.name.toLowerCase() === 'size') || [];
+  const colorVariants = product.variants?.filter((v) => v.name.toLowerCase() === 'color') || [];
+  const allSizesOutOfStock = sizeVariants.length > 0 && sizeVariants.every((v) => v.stock <= 0);
+  const allColorsOutOfStock = colorVariants.length > 0 && colorVariants.every((v) => v.stock <= 0);
+  const isOutOfStock = product.stock <= 0 || allSizesOutOfStock || allColorsOutOfStock;
   const isOffer = product.is_offer || product.variants?.some((v) => v.name.toLowerCase() === 'offer');
   const isBestSeller = product.is_bestseller || product.variants?.some((v) => v.name.toLowerCase() === 'bestseller');
 

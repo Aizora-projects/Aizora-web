@@ -61,16 +61,14 @@ export default function ProductDetailClient({ product }: ProductDetailClientProp
   const primaryImage = images.find((img) => img.is_primary) || images[0];
   const [selectedImage, setSelectedImage] = useState(primaryImage);
 
-  const availableSizes = (product.variants || [])
-    .filter((v) => v.name.toLowerCase() === 'size')
-    .map((v) => v.value);
+  const sizeVariants = (product.variants || []).filter((v) => v.name.toLowerCase() === 'size');
+  const colorVariants = (product.variants || []).filter((v) => v.name.toLowerCase() === 'color');
 
-  const availableColors = (product.variants || [])
-    .filter((v) => v.name.toLowerCase() === 'color')
-    .map((v) => v.value);
+  const firstInStockSize = sizeVariants.find((v) => v.stock > 0)?.value || sizeVariants[0]?.value || '';
+  const firstInStockColor = colorVariants.find((v) => v.stock > 0)?.value || colorVariants[0]?.value || '';
 
-  const [selectedSize, setSelectedSize] = useState<string>(availableSizes[0] || '');
-  const [selectedColor, setSelectedColor] = useState<string>(availableColors[0] || '');
+  const [selectedSize, setSelectedSize] = useState<string>(firstInStockSize);
+  const [selectedColor, setSelectedColor] = useState<string>(firstInStockColor);
   const [quantity, setQuantity] = useState(1);
   const [addedToCart, setAddedToCart] = useState(false);
   const router = useRouter();
@@ -83,6 +81,28 @@ export default function ProductDetailClient({ product }: ProductDetailClientProp
 
   const inStock = product.stock > 0;
 
+  const selectedSizeVariant = sizeVariants.find((v) => v.value === selectedSize);
+  const selectedColorVariant = colorVariants.find((v) => v.value === selectedColor);
+
+  const isCurrentSizeOutOfStock = sizeVariants.length > 0 && (selectedSizeVariant ? selectedSizeVariant.stock <= 0 : false);
+  const isCurrentColorOutOfStock = colorVariants.length > 0 && (selectedColorVariant ? selectedColorVariant.stock <= 0 : false);
+
+  const allSizesOutOfStock = sizeVariants.length > 0 && sizeVariants.every((v) => v.stock <= 0);
+  const allColorsOutOfStock = colorVariants.length > 0 && colorVariants.every((v) => v.stock <= 0);
+
+  const isProductOutOfStock = !inStock || allSizesOutOfStock || allColorsOutOfStock;
+  const isSelectedVariantSoldOut = isCurrentSizeOutOfStock || isCurrentColorOutOfStock;
+  const canPurchase = !isProductOutOfStock && !isSelectedVariantSoldOut;
+
+  const maxAvailableStock = Math.max(
+    0,
+    Math.min(
+      product.stock,
+      selectedSizeVariant ? selectedSizeVariant.stock : product.stock,
+      selectedColorVariant ? selectedColorVariant.stock : product.stock
+    )
+  );
+
   const imageToStore =
     primaryImage?.secure_url ||
     (primaryImage as any)?.url ||
@@ -90,14 +110,14 @@ export default function ProductDetailClient({ product }: ProductDetailClientProp
     null;
 
   const handleAddToCart = () => {
-    if (!inStock) return;
+    if (!canPurchase) return;
     addItem({
       product_id: product.id,
       product_name: product.name,
       product_slug: product.slug,
       product_image: imageToStore,
       price: product.price,
-      stock: product.stock,
+      stock: maxAvailableStock,
       size: selectedSize || undefined,
       color: selectedColor || undefined,
     });
@@ -106,14 +126,14 @@ export default function ProductDetailClient({ product }: ProductDetailClientProp
   };
 
   const handleBuyNow = () => {
-    if (!inStock) return;
+    if (!canPurchase) return;
     addItem({
       product_id: product.id,
       product_name: product.name,
       product_slug: product.slug,
       product_image: imageToStore,
       price: product.price,
-      stock: product.stock,
+      stock: maxAvailableStock,
       size: selectedSize || undefined,
       color: selectedColor || undefined,
     });
@@ -154,7 +174,7 @@ export default function ProductDetailClient({ product }: ProductDetailClientProp
 
               {/* Badges — Refined Minimalist Luxury Badges */}
               <div className="absolute top-4 left-4 flex flex-wrap items-center gap-1.5 max-w-[85%] z-10 pointer-events-none">
-                {!inStock ? (
+                {isProductOutOfStock ? (
                   <span className="px-3 py-1 rounded-full text-[9px] sm:text-[10px] uppercase font-bold tracking-wider bg-stone-900/90 text-white backdrop-blur-xs shadow-sm">
                     Out of Stock
                   </span>
@@ -259,75 +279,130 @@ export default function ProductDetailClient({ product }: ProductDetailClientProp
             )}
 
             {/* Divider */}
-            {(availableSizes.length > 0 || availableColors.length > 0) && (
+            {(sizeVariants.length > 0 || colorVariants.length > 0) && (
               <div className="border-t border-border/80 my-6" />
             )}
 
             {/* Size Selector (Only if product has size variants) */}
-            {availableSizes.length > 0 && (
+            {sizeVariants.length > 0 && (
               <div className="mb-6">
                 <div className="flex items-center justify-between mb-2.5">
                   <span className="text-xs tracking-[0.12em] uppercase text-brown-dark font-medium">
                     Select Size
                   </span>
                   <span className="text-[11px] text-brown-light font-body">
-                    Selected: <strong className="text-brown-dark">{selectedSize}</strong>
+                    Selected:{' '}
+                    <strong className="text-brown-dark">
+                      {selectedSize || 'None'}
+                    </strong>
+                    {isCurrentSizeOutOfStock && (
+                      <span className="ml-1.5 text-rose-600 font-bold">(Sold Out)</span>
+                    )}
                   </span>
                 </div>
                 <div className="flex flex-wrap gap-2">
-                  {availableSizes.map((size) => (
-                    <button
-                      key={size}
-                      type="button"
-                      onClick={() => setSelectedSize(size)}
-                      className={`min-w-[44px] h-10 px-3 flex items-center justify-center text-xs font-medium uppercase border transition-all rounded-xs ${
-                        selectedSize === size
-                          ? 'bg-brown-dark text-white border-brown-dark shadow-xs'
-                          : 'border-border text-brown-dark hover:border-bronze bg-white'
-                      }`}
-                    >
-                      {size}
-                    </button>
-                  ))}
+                  {sizeVariants.map((variant) => {
+                    const size = variant.value;
+                    const isOutOfStock = variant.stock <= 0;
+                    const isSelected = selectedSize === size;
+
+                    return (
+                      <button
+                        key={size}
+                        type="button"
+                        disabled={isOutOfStock}
+                        onClick={() => {
+                          if (!isOutOfStock) setSelectedSize(size);
+                        }}
+                        aria-disabled={isOutOfStock}
+                        title={isOutOfStock ? `${size} — Out of Stock` : size}
+                        className={`relative min-w-[48px] h-11 px-3.5 flex items-center justify-center text-xs font-medium uppercase border transition-all rounded-xs select-none ${
+                          isOutOfStock
+                            ? 'bg-stone-100/90 text-stone-400 border-stone-200 cursor-not-allowed opacity-60'
+                            : isSelected
+                            ? 'bg-brown-dark text-white border-brown-dark shadow-xs cursor-pointer'
+                            : 'border-border text-brown-dark hover:border-bronze bg-white cursor-pointer'
+                        }`}
+                      >
+                        <span className={isOutOfStock ? 'line-through decoration-rose-500 decoration-[1.5px] text-stone-400 font-semibold' : ''}>
+                          {size}
+                        </span>
+                        {isOutOfStock && (
+                          <span className="absolute -top-1.5 -right-1 px-1 py-0.2 bg-rose-500 text-white text-[7.5px] font-black uppercase rounded-xs leading-tight shadow-2xs">
+                            Out
+                          </span>
+                        )}
+                      </button>
+                    );
+                  })}
                 </div>
               </div>
             )}
 
             {/* Color Selector (Only if product has color variants) */}
-            {availableColors.length > 0 && (
+            {colorVariants.length > 0 && (
               <div className="mb-6">
                 <div className="flex items-center justify-between mb-2.5">
                   <span className="text-xs tracking-[0.12em] uppercase text-brown-dark font-medium">
                     Select Color
                   </span>
                   <span className="text-[11px] text-brown-light font-body">
-                    Selected: <strong className="text-brown-dark">{selectedColor}</strong>
+                    Selected:{' '}
+                    <strong className="text-brown-dark">
+                      {selectedColor || 'None'}
+                    </strong>
+                    {isCurrentColorOutOfStock && (
+                      <span className="ml-1.5 text-rose-600 font-bold">(Sold Out)</span>
+                    )}
                   </span>
                 </div>
                 <div className="flex flex-wrap gap-2">
-                  {availableColors.map((color) => {
+                  {colorVariants.map((variant) => {
+                    const color = variant.value;
+                    const isOutOfStock = variant.stock <= 0;
                     const isSelected = selectedColor === color;
                     const hex = COLOR_MAP[color.toLowerCase()];
+
                     return (
                       <button
                         key={color}
                         type="button"
-                        onClick={() => setSelectedColor(color)}
-                        className={`flex items-center gap-2 px-3.5 py-2 text-xs font-medium uppercase border transition-all rounded-xs ${
-                          isSelected
-                            ? 'bg-brown-dark text-white border-brown-dark shadow-xs'
-                            : 'border-border text-brown-dark hover:border-bronze bg-white'
+                        disabled={isOutOfStock}
+                        onClick={() => {
+                          if (!isOutOfStock) setSelectedColor(color);
+                        }}
+                        aria-disabled={isOutOfStock}
+                        title={isOutOfStock ? `${color} — Out of Stock` : color}
+                        className={`relative flex items-center gap-2 px-3.5 py-2.5 text-xs font-medium uppercase border transition-all rounded-xs select-none ${
+                          isOutOfStock
+                            ? 'bg-stone-100/90 text-stone-400 border-stone-200 cursor-not-allowed opacity-60'
+                            : isSelected
+                            ? 'bg-brown-dark text-white border-brown-dark shadow-xs cursor-pointer'
+                            : 'border-border text-brown-dark hover:border-bronze bg-white cursor-pointer'
                         }`}
                       >
                         {hex ? (
                           <span
-                            className="w-3.5 h-3.5 rounded-full border border-black/20 flex-shrink-0"
+                            className={`w-3.5 h-3.5 rounded-full border border-black/20 flex-shrink-0 ${
+                              isOutOfStock ? 'opacity-30 grayscale' : ''
+                            }`}
                             style={{ backgroundColor: hex }}
                           />
                         ) : (
-                          <span className="w-2.5 h-2.5 rounded-full bg-bronze/40 flex-shrink-0" />
+                          <span
+                            className={`w-2.5 h-2.5 rounded-full bg-bronze/40 flex-shrink-0 ${
+                              isOutOfStock ? 'opacity-30 grayscale' : ''
+                            }`}
+                          />
                         )}
-                        <span>{color}</span>
+                        <span className={isOutOfStock ? 'line-through decoration-rose-500 decoration-[1.5px] text-stone-400 font-semibold' : ''}>
+                          {color}
+                        </span>
+                        {isOutOfStock && (
+                          <span className="text-[8.5px] text-rose-500 font-bold uppercase tracking-tight">
+                            (Sold Out)
+                          </span>
+                        )}
                       </button>
                     );
                   })}
@@ -340,14 +415,26 @@ export default function ProductDetailClient({ product }: ProductDetailClientProp
 
             {/* Stock Status */}
             <div className="flex items-center gap-2 mb-6">
-              <div className={`w-2.5 h-2.5 rounded-full ${inStock ? 'bg-success animate-pulse' : 'bg-error'}`} />
-              <span className={`text-xs tracking-wider uppercase font-semibold ${inStock ? 'text-success' : 'text-error'}`}>
-                {inStock ? 'In Stock' : 'Out of Stock'}
+              <div
+                className={`w-2.5 h-2.5 rounded-full ${
+                  canPurchase ? 'bg-success animate-pulse' : 'bg-error'
+                }`}
+              />
+              <span
+                className={`text-xs tracking-wider uppercase font-semibold ${
+                  canPurchase ? 'text-success' : 'text-error'
+                }`}
+              >
+                {canPurchase
+                  ? 'In Stock'
+                  : isSelectedVariantSoldOut
+                  ? 'Selected Option Sold Out'
+                  : 'Out of Stock'}
               </span>
             </div>
 
             {/* Quantity */}
-            {inStock && (
+            {canPurchase && maxAvailableStock > 0 && (
               <div className="flex items-center gap-4 mb-6">
                 <span className="text-xs tracking-[0.1em] uppercase text-brown-light font-medium">
                   Quantity
@@ -364,7 +451,7 @@ export default function ProductDetailClient({ product }: ProductDetailClientProp
                     {quantity}
                   </span>
                   <button
-                    onClick={() => setQuantity(Math.min(product.stock, quantity + 1))}
+                    onClick={() => setQuantity(Math.min(maxAvailableStock, quantity + 1))}
                     className="p-2.5 text-brown-dark hover:text-tan transition-colors"
                     aria-label="Increase quantity"
                   >
@@ -374,23 +461,25 @@ export default function ProductDetailClient({ product }: ProductDetailClientProp
               </div>
             )}
 
-              {/* Action Buttons — BUY NOW & Add to Bag */}
+            {/* Action Buttons — BUY NOW & Add to Bag */}
             <div className="space-y-3 mb-8">
-              {/* BUY NOW Button with WhatsApp checkout */}
+              {/* BUY NOW Button */}
               <button
                 onClick={handleBuyNow}
-                disabled={!inStock}
+                disabled={!canPurchase}
                 className={`w-full flex items-center justify-center gap-2.5 py-3.5 px-6 text-xs tracking-[0.15em] uppercase font-semibold transition-all duration-300 rounded-xs shadow-md ${
-                  inStock
+                  canPurchase
                     ? 'bg-bronze hover:bg-bronze-dark text-white cursor-pointer'
                     : 'bg-sand/70 text-brown-muted cursor-not-allowed border border-border'
                 }`}
               >
-                {inStock ? (
+                {canPurchase ? (
                   <>
                     <Zap className="w-4 h-4 fill-white" />
                     <span>Buy Now</span>
                   </>
+                ) : isSelectedVariantSoldOut ? (
+                  <span>Selected Option Sold Out</span>
                 ) : (
                   <span>Out of Stock</span>
                 )}
@@ -399,17 +488,17 @@ export default function ProductDetailClient({ product }: ProductDetailClientProp
               {/* Add to Bag Secondary Button */}
               <button
                 onClick={handleAddToCart}
-                disabled={!inStock}
+                disabled={!canPurchase}
                 className={`w-full flex items-center justify-center gap-2 py-3 text-xs tracking-[0.15em] uppercase font-medium border transition-all duration-300 rounded-xs ${
-                  !inStock
+                  !canPurchase
                     ? 'border-border text-brown-muted/70 cursor-not-allowed bg-cream/40'
                     : addedToCart
                     ? 'bg-success text-white border-success'
                     : 'border-brown-dark text-brown-dark hover:bg-brown-dark hover:text-white'
                 }`}
               >
-                {!inStock ? (
-                  'Item Currently Unavailable'
+                {!canPurchase ? (
+                  isSelectedVariantSoldOut ? 'Option Sold Out' : 'Item Currently Unavailable'
                 ) : addedToCart ? (
                   <>
                     <Check className="w-4 h-4" />

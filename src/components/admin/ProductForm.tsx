@@ -7,6 +7,11 @@ import { createProduct, updateProduct, addProductImage, deleteProductImage } fro
 import { slugify } from '@/lib/utils';
 import type { Product, Category, ProductImage } from '@/types/database';
 
+interface VariantOption {
+  value: string;
+  stock: number;
+}
+
 interface ProductFormProps {
   product?: Product;
   categories: Category[];
@@ -51,12 +56,22 @@ export default function ProductForm({ product, categories }: ProductFormProps) {
     product?.images?.sort((a, b) => a.sort_order - b.sort_order) || []
   );
 
-  const initialSizes = product?.variants
-    ? product.variants.filter((v) => v.name.toLowerCase() === 'size').map((v) => v.value)
+  const initialSizes: VariantOption[] = product?.variants
+    ? product.variants
+        .filter((v) => v.name.toLowerCase() === 'size')
+        .map((v) => ({
+          value: v.value,
+          stock: typeof v.stock === 'number' ? v.stock : (product.stock ?? 10),
+        }))
     : [];
 
-  const initialColors = product?.variants
-    ? product.variants.filter((v) => v.name.toLowerCase() === 'color').map((v) => v.value)
+  const initialColors: VariantOption[] = product?.variants
+    ? product.variants
+        .filter((v) => v.name.toLowerCase() === 'color')
+        .map((v) => ({
+          value: v.value,
+          stock: typeof v.stock === 'number' ? v.stock : (product.stock ?? 10),
+        }))
     : [];
 
   const [hasSizes, setHasSizes] = useState<boolean>(
@@ -65,8 +80,8 @@ export default function ProductForm({ product, categories }: ProductFormProps) {
   const [hasColors, setHasColors] = useState<boolean>(
     isEditing ? initialColors.length > 0 : true
   );
-  const [selectedSizes, setSelectedSizes] = useState<string[]>(initialSizes);
-  const [selectedColors, setSelectedColors] = useState<string[]>(initialColors);
+  const [selectedSizes, setSelectedSizes] = useState<VariantOption[]>(initialSizes);
+  const [selectedColors, setSelectedColors] = useState<VariantOption[]>(initialColors);
   const [customSizeInput, setCustomSizeInput] = useState('');
   const [customColorInput, setCustomColorInput] = useState('');
 
@@ -75,32 +90,82 @@ export default function ProductForm({ product, categories }: ProductFormProps) {
   const [error, setError] = useState<string | null>(null);
   const [success, setSuccess] = useState<string | null>(null);
 
+  const isSizeSelected = (size: string) => selectedSizes.some((s) => s.value === size);
+  const getSizeStock = (size: string) => selectedSizes.find((s) => s.value === size)?.stock ?? 0;
+
   const toggleSize = (size: string) => {
+    setSelectedSizes((prev) => {
+      const exists = prev.some((s) => s.value === size);
+      if (exists) {
+        return prev.filter((s) => s.value !== size);
+      }
+      const defaultStock = Number(formData.stock) > 0 ? Number(formData.stock) : 10;
+      return [...prev, { value: size, stock: defaultStock }];
+    });
+  };
+
+  const updateSizeStock = (size: string, stock: number) => {
     setSelectedSizes((prev) =>
-      prev.includes(size) ? prev.filter((s) => s !== size) : [...prev, size]
+      prev.map((s) => (s.value === size ? { ...s, stock: Math.max(0, stock) } : s))
+    );
+  };
+
+  const toggleSizeStockout = (size: string) => {
+    setSelectedSizes((prev) =>
+      prev.map((s) => {
+        if (s.value !== size) return s;
+        const newStock = s.stock > 0 ? 0 : (Number(formData.stock) > 0 ? Number(formData.stock) : 10);
+        return { ...s, stock: newStock };
+      })
     );
   };
 
   const addCustomSize = (e?: React.FormEvent) => {
     if (e) e.preventDefault();
     const trimmed = customSizeInput.trim().toUpperCase();
-    if (trimmed && !selectedSizes.includes(trimmed)) {
-      setSelectedSizes((prev) => [...prev, trimmed]);
+    if (trimmed && !selectedSizes.some((s) => s.value === trimmed)) {
+      const defaultStock = Number(formData.stock) > 0 ? Number(formData.stock) : 10;
+      setSelectedSizes((prev) => [...prev, { value: trimmed, stock: defaultStock }]);
       setCustomSizeInput('');
     }
   };
 
+  const isColorSelected = (colorName: string) => selectedColors.some((c) => c.value === colorName);
+  const getColorStock = (colorName: string) => selectedColors.find((c) => c.value === colorName)?.stock ?? 0;
+
   const toggleColor = (colorName: string) => {
+    setSelectedColors((prev) => {
+      const exists = prev.some((c) => c.value === colorName);
+      if (exists) {
+        return prev.filter((c) => c.value !== colorName);
+      }
+      const defaultStock = Number(formData.stock) > 0 ? Number(formData.stock) : 10;
+      return [...prev, { value: colorName, stock: defaultStock }];
+    });
+  };
+
+  const updateColorStock = (colorName: string, stock: number) => {
     setSelectedColors((prev) =>
-      prev.includes(colorName) ? prev.filter((c) => c !== colorName) : [...prev, colorName]
+      prev.map((c) => (c.value === colorName ? { ...c, stock: Math.max(0, stock) } : c))
+    );
+  };
+
+  const toggleColorStockout = (colorName: string) => {
+    setSelectedColors((prev) =>
+      prev.map((c) => {
+        if (c.value !== colorName) return c;
+        const newStock = c.stock > 0 ? 0 : (Number(formData.stock) > 0 ? Number(formData.stock) : 10);
+        return { ...c, stock: newStock };
+      })
     );
   };
 
   const addCustomColor = (e?: React.FormEvent) => {
     if (e) e.preventDefault();
     const trimmed = customColorInput.trim();
-    if (trimmed && !selectedColors.includes(trimmed)) {
-      setSelectedColors((prev) => [...prev, trimmed]);
+    if (trimmed && !selectedColors.some((c) => c.value === trimmed)) {
+      const defaultStock = Number(formData.stock) > 0 ? Number(formData.stock) : 10;
+      setSelectedColors((prev) => [...prev, { value: trimmed, stock: defaultStock }]);
       setCustomColorInput('');
     }
   };
@@ -211,8 +276,8 @@ export default function ProductForm({ product, categories }: ProductFormProps) {
       price: Number(formData.price),
       compare_at_price: formData.compare_at_price ? Number(formData.compare_at_price) : null,
       stock: Number(formData.stock),
-      sizes: hasSizes ? selectedSizes : [],
-      colors: hasColors ? selectedColors : [],
+      sizes: hasSizes ? selectedSizes.map((s) => ({ value: s.value, stock: Number(s.stock) || 0 })) : [],
+      colors: hasColors ? selectedColors.map((c) => ({ value: c.value, stock: Number(c.stock) || 0 })) : [],
     };
 
     let result;
@@ -477,7 +542,9 @@ export default function ProductForm({ product, categories }: ProductFormProps) {
                     type="button"
                     onClick={() => {
                       setHasSizes(true);
-                      if (selectedSizes.length === 0) setSelectedSizes(['Free Size']);
+                      if (selectedSizes.length === 0) {
+                        setSelectedSizes([{ value: 'Free Size', stock: Number(formData.stock) || 10 }]);
+                      }
                     }}
                     className={`px-3 py-1 text-xs font-semibold rounded-md transition-all ${
                       hasSizes
@@ -505,36 +572,53 @@ export default function ProductForm({ product, categories }: ProductFormProps) {
               </div>
 
               {hasSizes ? (
-                <div className="pt-4">
+                <div className="pt-4 space-y-4">
                   {/* Quick Action + Preset Size Chips */}
-                  <div className="flex flex-wrap items-center gap-2 mb-3">
-                    <button
-                      type="button"
-                      onClick={() => {
-                        setHasSizes(false);
-                        setSelectedSizes([]);
-                      }}
-                      className="px-3 py-1.5 rounded-lg text-xs font-bold transition-all bg-rose-50 text-rose-700 border border-rose-200 hover:bg-rose-100"
-                    >
-                      ✕ Set to No Size
-                    </button>
-                    {PRESET_SIZES.map((size) => {
-                      const isSelected = selectedSizes.includes(size);
-                      return (
-                        <button
-                          key={size}
-                          type="button"
-                          onClick={() => toggleSize(size)}
-                          className={`px-3.5 py-1.5 rounded-lg text-xs font-bold transition-all ${
-                            isSelected
-                              ? 'bg-stone-900 text-white shadow-xs'
-                              : 'bg-[#FAF8F5] text-stone-700 border border-admin-border hover:border-tan'
-                          }`}
-                        >
-                          {size}
-                        </button>
-                      );
-                    })}
+                  <div>
+                    <div className="flex items-center justify-between mb-2">
+                      <span className="text-[11px] font-bold text-stone-600 uppercase tracking-wider">
+                        Select Preset Sizes:
+                      </span>
+                      <button
+                        type="button"
+                        onClick={() => {
+                          setHasSizes(false);
+                          setSelectedSizes([]);
+                        }}
+                        className="px-2.5 py-1 rounded-md text-[11px] font-semibold transition-all bg-rose-50 text-rose-700 border border-rose-200 hover:bg-rose-100"
+                      >
+                        ✕ Remove All Sizes
+                      </button>
+                    </div>
+
+                    <div className="flex flex-wrap items-center gap-1.5">
+                      {PRESET_SIZES.map((size) => {
+                        const isSelected = isSizeSelected(size);
+                        const stock = getSizeStock(size);
+                        const isOut = isSelected && stock <= 0;
+                        return (
+                          <button
+                            key={size}
+                            type="button"
+                            onClick={() => toggleSize(size)}
+                            className={`px-3 py-1.5 rounded-lg text-xs font-bold transition-all inline-flex items-center gap-1.5 border ${
+                              isSelected
+                                ? isOut
+                                  ? 'bg-rose-50 text-rose-700 border-rose-300 shadow-2xs'
+                                  : 'bg-stone-900 text-white border-stone-900 shadow-xs'
+                                : 'bg-[#FAF8F5] text-stone-700 border-admin-border hover:border-tan'
+                            }`}
+                          >
+                            <span className={isOut ? 'line-through' : ''}>{size}</span>
+                            {isSelected && (
+                              <span className={`text-[9px] font-normal ${isOut ? 'text-rose-600 font-bold' : 'text-stone-300'}`}>
+                                {isOut ? '(Out)' : `(${stock})`}
+                              </span>
+                            )}
+                          </button>
+                        );
+                      })}
+                    </div>
                   </div>
 
                   {/* Custom Size Input */}
@@ -562,28 +646,97 @@ export default function ProductForm({ product, categories }: ProductFormProps) {
                     </button>
                   </div>
 
-                  {/* Selected Sizes Summary */}
+                  {/* Configured Sizes & Individual Stock Control */}
                   {selectedSizes.length > 0 ? (
-                    <div className="mt-3 flex flex-wrap items-center gap-1.5 text-xs text-stone-600 bg-stone-50 p-2.5 rounded-lg border border-stone-200">
-                      <span className="font-semibold text-stone-700">Selected Sizes ({selectedSizes.length}):</span>
-                      {selectedSizes.map((s) => (
-                        <span
-                          key={s}
-                          className="inline-flex items-center gap-1 bg-white border border-stone-300 rounded px-2 py-0.5 text-xs font-bold"
-                        >
-                          {s}
-                          <button
-                            type="button"
-                            onClick={() => toggleSize(s)}
-                            className="text-stone-400 hover:text-rose-600"
-                          >
-                            <X className="w-3 h-3" />
-                          </button>
+                    <div className="p-3 bg-stone-50 border border-stone-200 rounded-xl space-y-2.5">
+                      <div className="flex items-center justify-between pb-2 border-b border-stone-200">
+                        <span className="text-xs font-bold uppercase tracking-wider text-stone-900">
+                          Sizes & Stock Control ({selectedSizes.length}):
                         </span>
-                      ))}
+                        <span className="text-[10px] text-stone-500 font-medium">
+                          Click &quot;Stock Out&quot; to strike out size on store
+                        </span>
+                      </div>
+
+                      <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
+                        {selectedSizes.map((s) => {
+                          const isOut = s.stock <= 0;
+                          return (
+                            <div
+                              key={s.value}
+                              className={`p-2.5 rounded-lg border transition-all flex items-center justify-between gap-2.5 ${
+                                isOut
+                                  ? 'bg-rose-50/80 border-rose-200'
+                                  : 'bg-white border-stone-200 shadow-2xs'
+                              }`}
+                            >
+                              <div className="flex items-center gap-2 min-w-0">
+                                <span
+                                  className={`px-2 py-0.5 rounded text-xs font-black uppercase ${
+                                    isOut
+                                      ? 'bg-rose-200 text-rose-800 line-through'
+                                      : 'bg-stone-900 text-white'
+                                  }`}
+                                >
+                                  {s.value}
+                                </span>
+                                <div className="flex flex-col min-w-0">
+                                  <span className="text-xs font-bold text-stone-900 truncate">
+                                    Size {s.value}
+                                  </span>
+                                  <span
+                                    className={`text-[10px] font-semibold ${
+                                      isOut ? 'text-rose-600 font-bold line-through' : 'text-emerald-700'
+                                    }`}
+                                  >
+                                    {isOut ? '✕ Stock Out (Sold Out)' : `✓ In Stock (${s.stock})`}
+                                  </span>
+                                </div>
+                              </div>
+
+                              <div className="flex items-center gap-1.5 flex-shrink-0">
+                                {/* 1-Click Stockout / In-Stock Button */}
+                                <button
+                                  type="button"
+                                  onClick={() => toggleSizeStockout(s.value)}
+                                  className={`px-2 py-1 text-[10px] font-bold uppercase tracking-wider rounded border transition-colors ${
+                                    isOut
+                                      ? 'bg-emerald-600 hover:bg-emerald-700 text-white border-emerald-600 shadow-2xs'
+                                      : 'bg-rose-50 hover:bg-rose-100 text-rose-700 border-rose-300'
+                                  }`}
+                                >
+                                  {isOut ? '✓ In-Stock' : '✕ Stock Out'}
+                                </button>
+
+                                {/* Direct Qty input */}
+                                <div className="flex items-center gap-1">
+                                  <input
+                                    type="number"
+                                    min="0"
+                                    aria-label={`Stock for size ${s.value}`}
+                                    value={s.stock}
+                                    onChange={(e) => updateSizeStock(s.value, parseInt(e.target.value) || 0)}
+                                    className="w-12 bg-[#FAF8F5] border border-admin-border rounded px-1.5 py-1 text-xs text-center font-bold text-stone-900 focus:bg-white focus:outline-none focus:border-tan"
+                                  />
+                                </div>
+
+                                {/* Delete */}
+                                <button
+                                  type="button"
+                                  onClick={() => toggleSize(s.value)}
+                                  title="Remove size"
+                                  className="p-1 text-stone-400 hover:text-rose-600 rounded transition-colors"
+                                >
+                                  <X className="w-3.5 h-3.5" />
+                                </button>
+                              </div>
+                            </div>
+                          );
+                        })}
+                      </div>
                     </div>
                   ) : (
-                    <p className="mt-2 text-[11px] text-amber-600">
+                    <p className="text-[11px] text-amber-600">
                       No sizes selected yet. Click size chips above or choose &quot;No Size Option&quot;.
                     </p>
                   )}
@@ -592,13 +745,13 @@ export default function ProductForm({ product, categories }: ProductFormProps) {
                 <div className="mt-3 p-3.5 bg-stone-50 border border-stone-200 rounded-xl text-xs text-stone-600 flex flex-col sm:flex-row sm:items-center justify-between gap-3">
                   <div className="flex items-center gap-2">
                     <span className="w-2 h-2 rounded-full bg-rose-500 flex-shrink-0" />
-                    <span>✓ <strong>No Size Option Active:</strong> This product will display without size selection. Customers can buy it directly as a single / free size.</span>
+                    <span>✓ <strong>No Size Option Active:</strong> Product will display without size selection (sold as single / free size).</span>
                   </div>
                   <button
                     type="button"
                     onClick={() => {
                       setHasSizes(true);
-                      setSelectedSizes(['Free Size']);
+                      setSelectedSizes([{ value: 'Free Size', stock: Number(formData.stock) || 10 }]);
                     }}
                     className="px-3 py-1.5 bg-stone-900 hover:bg-black text-white font-bold uppercase tracking-wider text-[11px] rounded-lg flex-shrink-0 transition-colors"
                   >
@@ -630,7 +783,9 @@ export default function ProductForm({ product, categories }: ProductFormProps) {
                     type="button"
                     onClick={() => {
                       setHasColors(true);
-                      if (selectedColors.length === 0) setSelectedColors(['Maroon']);
+                      if (selectedColors.length === 0) {
+                        setSelectedColors([{ value: 'Maroon', stock: Number(formData.stock) || 10 }]);
+                      }
                     }}
                     className={`px-3 py-1 text-xs font-semibold rounded-md transition-all ${
                       hasColors
@@ -658,40 +813,59 @@ export default function ProductForm({ product, categories }: ProductFormProps) {
               </div>
 
               {hasColors ? (
-                <div className="pt-4">
+                <div className="pt-4 space-y-4">
                   {/* Quick Action + Popular Color Chips */}
-                  <div className="flex flex-wrap items-center gap-2 mb-3">
-                    <button
-                      type="button"
-                      onClick={() => {
-                        setHasColors(false);
-                        setSelectedColors([]);
-                      }}
-                      className="px-3 py-1.5 rounded-lg text-xs font-bold transition-all bg-rose-50 text-rose-700 border border-rose-200 hover:bg-rose-100"
-                    >
-                      ✕ Set to No Color
-                    </button>
-                    {POPULAR_COLORS.map((col) => {
-                      const isSelected = selectedColors.includes(col.name);
-                      return (
-                        <button
-                          key={col.name}
-                          type="button"
-                          onClick={() => toggleColor(col.name)}
-                          className={`inline-flex items-center gap-2 px-3 py-1.5 rounded-lg text-xs font-semibold transition-all border ${
-                            isSelected
-                              ? 'border-stone-900 bg-stone-900 text-white shadow-xs'
-                              : 'bg-[#FAF8F5] text-stone-800 border-admin-border hover:border-tan'
-                          }`}
-                        >
-                          <span
-                            className="w-3 h-3 rounded-full border border-black/20 flex-shrink-0"
-                            style={{ backgroundColor: col.hex }}
-                          />
-                          <span>{col.name}</span>
-                        </button>
-                      );
-                    })}
+                  <div>
+                    <div className="flex items-center justify-between mb-2">
+                      <span className="text-[11px] font-bold text-stone-600 uppercase tracking-wider">
+                        Select Popular Colors:
+                      </span>
+                      <button
+                        type="button"
+                        onClick={() => {
+                          setHasColors(false);
+                          setSelectedColors([]);
+                        }}
+                        className="px-2.5 py-1 rounded-md text-[11px] font-semibold transition-all bg-rose-50 text-rose-700 border border-rose-200 hover:bg-rose-100"
+                      >
+                        ✕ Remove All Colors
+                      </button>
+                    </div>
+
+                    <div className="flex flex-wrap items-center gap-1.5">
+                      {POPULAR_COLORS.map((col) => {
+                        const isSelected = isColorSelected(col.name);
+                        const stock = getColorStock(col.name);
+                        const isOut = isSelected && stock <= 0;
+                        return (
+                          <button
+                            key={col.name}
+                            type="button"
+                            onClick={() => toggleColor(col.name)}
+                            className={`inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-semibold transition-all border ${
+                              isSelected
+                                ? isOut
+                                  ? 'border-rose-300 bg-rose-50 text-rose-800 shadow-2xs'
+                                  : 'border-stone-900 bg-stone-900 text-white shadow-xs'
+                                : 'bg-[#FAF8F5] text-stone-800 border-admin-border hover:border-tan'
+                            }`}
+                          >
+                            <span
+                              className={`w-3 h-3 rounded-full border border-black/20 flex-shrink-0 ${
+                                isOut ? 'grayscale opacity-50' : ''
+                              }`}
+                              style={{ backgroundColor: col.hex }}
+                            />
+                            <span className={isOut ? 'line-through' : ''}>{col.name}</span>
+                            {isSelected && (
+                              <span className={`text-[9px] ${isOut ? 'text-rose-600 font-bold' : 'text-stone-300'}`}>
+                                {isOut ? '(Out)' : `(${stock})`}
+                              </span>
+                            )}
+                          </button>
+                        );
+                      })}
+                    </div>
                   </div>
 
                   {/* Custom Color Input */}
@@ -719,28 +893,111 @@ export default function ProductForm({ product, categories }: ProductFormProps) {
                     </button>
                   </div>
 
-                  {/* Selected Colors Summary */}
+                  {/* Configured Colors & Individual Stock Control */}
                   {selectedColors.length > 0 ? (
-                    <div className="mt-3 flex flex-wrap items-center gap-1.5 text-xs text-stone-600 bg-stone-50 p-2.5 rounded-lg border border-stone-200">
-                      <span className="font-semibold text-stone-700">Selected Colors ({selectedColors.length}):</span>
-                      {selectedColors.map((c) => (
-                        <span
-                          key={c}
-                          className="inline-flex items-center gap-1 bg-white border border-stone-300 rounded px-2 py-0.5 text-xs font-bold"
-                        >
-                          {c}
-                          <button
-                            type="button"
-                            onClick={() => toggleColor(c)}
-                            className="text-stone-400 hover:text-rose-600"
-                          >
-                            <X className="w-3 h-3" />
-                          </button>
+                    <div className="p-3 bg-stone-50 border border-stone-200 rounded-xl space-y-2.5">
+                      <div className="flex items-center justify-between pb-2 border-b border-stone-200">
+                        <span className="text-xs font-bold uppercase tracking-wider text-stone-900">
+                          Colors & Stock Control ({selectedColors.length}):
                         </span>
-                      ))}
+                        <span className="text-[10px] text-stone-500 font-medium">
+                          Click &quot;Stock Out&quot; to strike out color on store
+                        </span>
+                      </div>
+
+                      <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
+                        {selectedColors.map((c) => {
+                          const isOut = c.stock <= 0;
+                          const popular = POPULAR_COLORS.find(
+                            (p) => p.name.toLowerCase() === c.value.toLowerCase()
+                          );
+                          const hex = popular?.hex;
+
+                          return (
+                            <div
+                              key={c.value}
+                              className={`p-2.5 rounded-lg border transition-all flex items-center justify-between gap-2.5 ${
+                                isOut
+                                  ? 'bg-rose-50/80 border-rose-200'
+                                  : 'bg-white border-stone-200 shadow-2xs'
+                              }`}
+                            >
+                              <div className="flex items-center gap-2.5 min-w-0">
+                                {hex ? (
+                                  <span
+                                    className={`w-5 h-5 rounded-full border border-black/20 flex-shrink-0 ${
+                                      isOut ? 'grayscale opacity-40' : ''
+                                    }`}
+                                    style={{ backgroundColor: hex }}
+                                  />
+                                ) : (
+                                  <span
+                                    className={`w-5 h-5 rounded-full bg-stone-300 flex-shrink-0 ${
+                                      isOut ? 'opacity-40' : ''
+                                    }`}
+                                  />
+                                )}
+                                <div className="flex flex-col min-w-0">
+                                  <span
+                                    className={`text-xs font-bold text-stone-900 truncate ${
+                                      isOut ? 'line-through text-stone-400' : ''
+                                    }`}
+                                  >
+                                    {c.value}
+                                  </span>
+                                  <span
+                                    className={`text-[10px] font-semibold ${
+                                      isOut ? 'text-rose-600 font-bold line-through' : 'text-emerald-700'
+                                    }`}
+                                  >
+                                    {isOut ? '✕ Stock Out (Sold Out)' : `✓ In Stock (${c.stock})`}
+                                  </span>
+                                </div>
+                              </div>
+
+                              <div className="flex items-center gap-1.5 flex-shrink-0">
+                                {/* 1-Click Stockout / In-Stock Button */}
+                                <button
+                                  type="button"
+                                  onClick={() => toggleColorStockout(c.value)}
+                                  className={`px-2 py-1 text-[10px] font-bold uppercase tracking-wider rounded border transition-colors ${
+                                    isOut
+                                      ? 'bg-emerald-600 hover:bg-emerald-700 text-white border-emerald-600 shadow-2xs'
+                                      : 'bg-rose-50 hover:bg-rose-100 text-rose-700 border-rose-300'
+                                  }`}
+                                >
+                                  {isOut ? '✓ In-Stock' : '✕ Stock Out'}
+                                </button>
+
+                                {/* Direct Qty input */}
+                                <div className="flex items-center gap-1">
+                                  <input
+                                    type="number"
+                                    min="0"
+                                    aria-label={`Stock for color ${c.value}`}
+                                    value={c.stock}
+                                    onChange={(e) => updateColorStock(c.value, parseInt(e.target.value) || 0)}
+                                    className="w-12 bg-[#FAF8F5] border border-admin-border rounded px-1.5 py-1 text-xs text-center font-bold text-stone-900 focus:bg-white focus:outline-none focus:border-tan"
+                                  />
+                                </div>
+
+                                {/* Delete */}
+                                <button
+                                  type="button"
+                                  onClick={() => toggleColor(c.value)}
+                                  title="Remove color"
+                                  className="p-1 text-stone-400 hover:text-rose-600 rounded transition-colors"
+                                >
+                                  <X className="w-3.5 h-3.5" />
+                                </button>
+                              </div>
+                            </div>
+                          );
+                        })}
+                      </div>
                     </div>
                   ) : (
-                    <p className="mt-2 text-[11px] text-amber-600">
+                    <p className="text-[11px] text-amber-600">
                       No colors selected yet. Click swatches above or choose &quot;No Color Option&quot;.
                     </p>
                   )}
@@ -755,7 +1012,7 @@ export default function ProductForm({ product, categories }: ProductFormProps) {
                     type="button"
                     onClick={() => {
                       setHasColors(true);
-                      setSelectedColors(['Maroon']);
+                      setSelectedColors([{ value: 'Maroon', stock: Number(formData.stock) || 10 }]);
                     }}
                     className="px-3 py-1.5 bg-stone-900 hover:bg-black text-white font-bold uppercase tracking-wider text-[11px] rounded-lg flex-shrink-0 transition-colors"
                   >

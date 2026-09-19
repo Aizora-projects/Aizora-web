@@ -223,28 +223,34 @@ export async function createProduct(formData: Record<string, unknown>) {
   }
 
   if (Array.isArray(sizes)) {
-    sizes.forEach((size) => {
-      if (typeof size === 'string' && size.trim()) {
+    sizes.forEach((s: any) => {
+      const val = typeof s === 'string' ? s.trim() : (s?.value ? String(s.value).trim() : '');
+      const hasStock = typeof s === 'object' && s !== null && s.stock !== undefined && s.stock !== null && !isNaN(Number(s.stock));
+      const varStock = hasStock ? Math.max(0, Number(s.stock)) : (data.stock ?? 10);
+      if (val) {
         variantsToInsert.push({
           product_id: data.id,
           name: 'size',
-          value: size.trim(),
+          value: val,
           price_modifier: 0,
-          stock: data.stock,
+          stock: varStock,
         });
       }
     });
   }
 
   if (Array.isArray(colors)) {
-    colors.forEach((color) => {
-      if (typeof color === 'string' && color.trim()) {
+    colors.forEach((c: any) => {
+      const val = typeof c === 'string' ? c.trim() : (c?.value ? String(c.value).trim() : '');
+      const hasStock = typeof c === 'object' && c !== null && c.stock !== undefined && c.stock !== null && !isNaN(Number(c.stock));
+      const varStock = hasStock ? Math.max(0, Number(c.stock)) : (data.stock ?? 10);
+      if (val) {
         variantsToInsert.push({
           product_id: data.id,
           name: 'color',
-          value: color.trim(),
+          value: val,
           price_modifier: 0,
-          stock: data.stock,
+          stock: varStock,
         });
       }
     });
@@ -323,28 +329,34 @@ export async function updateProduct(id: string, formData: Record<string, unknown
   }
 
   if (Array.isArray(sizes)) {
-    sizes.forEach((size) => {
-      if (typeof size === 'string' && size.trim()) {
+    sizes.forEach((s: any) => {
+      const val = typeof s === 'string' ? s.trim() : (s?.value ? String(s.value).trim() : '');
+      const hasStock = typeof s === 'object' && s !== null && s.stock !== undefined && s.stock !== null && !isNaN(Number(s.stock));
+      const varStock = hasStock ? Math.max(0, Number(s.stock)) : (data.stock ?? 10);
+      if (val) {
         variantsToInsert.push({
           product_id: id,
           name: 'size',
-          value: size.trim(),
+          value: val,
           price_modifier: 0,
-          stock: data.stock,
+          stock: varStock,
         });
       }
     });
   }
 
   if (Array.isArray(colors)) {
-    colors.forEach((color) => {
-      if (typeof color === 'string' && color.trim()) {
+    colors.forEach((c: any) => {
+      const val = typeof c === 'string' ? c.trim() : (c?.value ? String(c.value).trim() : '');
+      const hasStock = typeof c === 'object' && c !== null && c.stock !== undefined && c.stock !== null && !isNaN(Number(c.stock));
+      const varStock = hasStock ? Math.max(0, Number(c.stock)) : (data.stock ?? 10);
+      if (val) {
         variantsToInsert.push({
           product_id: id,
           name: 'color',
-          value: color.trim(),
+          value: val,
           price_modifier: 0,
-          stock: data.stock,
+          stock: varStock,
         });
       }
     });
