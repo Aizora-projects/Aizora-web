@@ -77,10 +77,11 @@ export const metadata: Metadata = {
       'AIZORA — Premier Indian women\'s clothing brand. Discover handcrafted cotton sets, designer ethnic wear, co-ord sets & elegant party wear with Free Delivery Pan India.',
     images: [
       {
-        url: '/icon.png',
+        url: '/opengraph-image',
         width: 1200,
         height: 630,
-        alt: 'AIZORA — Best Clothing Brand for Women',
+        alt: 'AIZORA — Best Clothing Brand for Women | aizorastyle.in',
+        type: 'image/png',
       },
     ],
   },
@@ -89,7 +90,7 @@ export const metadata: Metadata = {
     title: 'AIZORA | Best Women\'s Clothing Brand & Luxury Ladies Fashion',
     description:
       'Premier Indian women\'s clothing brand. Handcrafted cotton sets, ethnic wear, co-ord sets & designer ladies fashion.',
-    images: ['/icon.png'],
+    images: ['/opengraph-image'],
     creator: '@aizorastyle',
   },
   robots: {

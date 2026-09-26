@@ -5,8 +5,29 @@ import Link from 'next/link';
 import { getCategories } from '@/actions/categories';
 import { getProducts } from '@/actions/products';
 import { ArrowRight } from 'lucide-react';
+import type { Metadata } from 'next';
 
 export const dynamic = 'force-dynamic';
+
+const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL || 'https://aizorastyle.in';
+
+export const metadata: Metadata = {
+  title: 'AIZORA | Best Women\'s Clothing Brand & Luxury Ladies Fashion Online',
+  description:
+    'AIZORA (aizorastyle.in) — India\'s premier women\'s clothing brand. Shop handcrafted cotton sets, designer ethnic wear, co-ord sets, party wear & plus size collections. Free Pan-India Delivery.',
+  alternates: {
+    canonical: '/',
+  },
+  openGraph: {
+    title: 'AIZORA | Best Women\'s Clothing Brand & Luxury Ladies Fashion',
+    description:
+      'Premier Indian women\'s clothing brand. Handcrafted cotton sets, ethnic wear, co-ord sets & designer ladies fashion with Free Pan-India Delivery.',
+    url: SITE_URL,
+    siteName: 'AIZORA',
+    type: 'website',
+    locale: 'en_IN',
+  },
+};
 
 export default async function HomePage() {
   // Fetch real data from Supabase
@@ -19,8 +40,61 @@ export default async function HomePage() {
   const newArrivals = newArrivalsResult.data;
   const bestSellers = bestSellersResult.data;
 
+  const faqSchema = {
+    '@context': 'https://schema.org',
+    '@type': 'FAQPage',
+    mainEntity: [
+      {
+        '@type': 'Question',
+        name: 'What is AIZORA?',
+        acceptedAnswer: {
+          '@type': 'Answer',
+          text: 'AIZORA (aizorastyle.in) is India\'s premier women\'s clothing brand offering a curated range of handcrafted ethnic wear, designer co-ord sets, cotton kurti sets, party wear dresses, western wear, and plus size fashion. Every piece is crafted to celebrate feminine elegance with premium fabrics and contemporary designs.',
+        },
+      },
+      {
+        '@type': 'Question',
+        name: 'Does AIZORA offer free delivery in India?',
+        acceptedAnswer: {
+          '@type': 'Answer',
+          text: 'Yes! AIZORA offers Free Pan-India Delivery on all orders. We deliver reliably across all states and cities in India with secure prepaid checkout via our website aizorastyle.in.',
+        },
+      },
+      {
+        '@type': 'Question',
+        name: 'What types of women\'s clothing does AIZORA sell?',
+        acceptedAnswer: {
+          '@type': 'Answer',
+          text: 'AIZORA sells a wide variety of ladies fashion including cotton suit sets, ethnic kurtis, designer co-ord sets, festive and party wear dresses, casual western wear, and an inclusive plus size collection — all available online at aizorastyle.in.',
+        },
+      },
+      {
+        '@type': 'Question',
+        name: 'Is AIZORA a good clothing brand for ladies in India?',
+        acceptedAnswer: {
+          '@type': 'Answer',
+          text: 'Absolutely. AIZORA is rated as one of the best clothing brands for women in India, known for its premium fabric quality, elegant designs, inclusive sizing, and outstanding customer service via WhatsApp support. Shop at aizorastyle.in.',
+        },
+      },
+      {
+        '@type': 'Question',
+        name: 'Does AIZORA have plus size clothing?',
+        acceptedAnswer: {
+          '@type': 'Answer',
+          text: 'Yes, AIZORA has a dedicated plus size collection featuring flattering silhouettes and premium fabrics designed for all body types. Browse the plus size range at aizorastyle.in/category/plus-size.',
+        },
+      },
+    ],
+  };
+
   return (
     <>
+      {/* FAQ Rich Result Schema for Google Featured Snippets */}
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(faqSchema) }}
+      />
+
       {/* Hero Section — Exact Typography & Editorial Layout */}
       <Hero />
 
