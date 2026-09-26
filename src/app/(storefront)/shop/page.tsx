@@ -6,9 +6,34 @@ import ShopSort from '@/components/storefront/ShopSort';
 import Link from 'next/link';
 import { ChevronRight } from 'lucide-react';
 
+const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL || 'https://aizorastyle.in';
+
 export const metadata: Metadata = {
-  title: 'Shop All',
-  description: 'Browse our entire collection of premium women\'s fashion at AIZORA.',
+  title: 'Shop All Women\'s Fashion & Designer Collections | AIZORA',
+  description:
+    'Browse the full AIZORA catalogue (aizorastyle.in) — the best clothing brand for ladies. Shop handcrafted cotton sets, designer kurtis, ethnic wear, co-ord sets, party wear & plus size fashion with Free Pan-India Delivery.',
+  keywords: [
+    'Aizora Shop',
+    'Aizora Style',
+    'shop women clothing online India',
+    'best clothing brand for ladies',
+    'designer kurtis online',
+    'cotton suits online',
+    'ladies party wear dresses',
+    'women co-ord sets',
+  ],
+  alternates: {
+    canonical: '/shop',
+  },
+  openGraph: {
+    title: 'Shop All Women\'s Fashion | AIZORA — Best Clothing Brand',
+    description:
+      'Browse our curated collection of premium women\'s fashion at AIZORA. Handcrafted ethnic wear, cotton sets, and designer ladies fashion.',
+    url: `${SITE_URL}/shop`,
+    siteName: 'AIZORA',
+    type: 'website',
+    locale: 'en_IN',
+  },
 };
 
 interface ShopPageProps {
@@ -33,14 +58,51 @@ export default async function ShopPage({ searchParams }: ShopPageProps) {
     orderDir: sort === 'price-low' ? 'asc' : sort === 'price-high' ? 'asc' : 'desc',
   });
 
+  const shopJsonLd = {
+    '@context': 'https://schema.org',
+    '@type': 'CollectionPage',
+    name: 'Shop All Women\'s Fashion',
+    description: 'Browse our complete collection of premium ladies fashion at AIZORA',
+    url: `${SITE_URL}/shop`,
+  };
+
+  const breadcrumbsJsonLd = {
+    '@context': 'https://schema.org',
+    '@type': 'BreadcrumbList',
+    itemListElement: [
+      {
+        '@type': 'ListItem',
+        position: 1,
+        name: 'Home',
+        item: SITE_URL,
+      },
+      {
+        '@type': 'ListItem',
+        position: 2,
+        name: 'Shop',
+        item: `${SITE_URL}/shop`,
+      },
+    ],
+  };
+
   return (
     <div className="bg-ivory min-h-screen">
+      {/* Schema.org Structured Data */}
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(shopJsonLd) }}
+      />
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(breadcrumbsJsonLd) }}
+      />
+
       {/* Breadcrumb */}
       <div className="max-w-7xl mx-auto px-4 lg:px-8 py-4">
-        <nav className="flex items-center gap-2 text-xs text-brown-light">
+        <nav aria-label="Breadcrumb" className="flex items-center gap-2 text-xs text-brown-light">
           <Link href="/" className="hover:text-gold transition-colors">Home</Link>
           <ChevronRight className="w-3 h-3" />
-          <span className="text-brown-dark font-medium">Shop</span>
+          <span className="text-brown-dark font-medium" aria-current="page">Shop</span>
         </nav>
       </div>
 
@@ -58,39 +120,39 @@ export default async function ShopPage({ searchParams }: ShopPageProps) {
 
       <div className="max-w-7xl mx-auto px-4 lg:px-8 pb-16">
         {/* Filters */}
-        <div className="flex flex-wrap items-center gap-3 mb-8">
-          <Link
-            href="/shop"
-            className={`px-4 py-2 text-xs tracking-wider uppercase border transition-colors ${
-              !category && !filter
-                ? 'bg-brown-dark text-cream border-brown-dark'
-                : 'border-border text-brown-dark hover:border-gold'
-            }`}
-          >
-            All
-          </Link>
-          {categories.map((cat) => (
+        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-8 pb-4 border-b border-border">
+          {/* Category Tabs */}
+          <div className="flex items-center gap-2 overflow-x-auto pb-2 sm:pb-0 scrollbar-none">
             <Link
-              key={cat.id}
-              href={`/shop?category=${cat.id}`}
-              className={`px-4 py-2 text-xs tracking-wider uppercase border transition-colors ${
-                category === cat.id
-                  ? 'bg-brown-dark text-cream border-brown-dark'
-                  : 'border-border text-brown-dark hover:border-gold'
+              href="/shop"
+              className={`px-3 py-1.5 text-xs tracking-wider uppercase rounded-xs whitespace-nowrap transition-colors ${
+                !category
+                  ? 'bg-brown-dark text-cream'
+                  : 'bg-cream text-brown-dark hover:bg-gold/10'
               }`}
             >
-              {cat.name}
+              All
             </Link>
-          ))}
-        </div>
+            {categories.map((cat) => (
+              <Link
+                key={cat.id}
+                href={`/shop?category=${cat.id}`}
+                className={`px-3 py-1.5 text-xs tracking-wider uppercase rounded-xs whitespace-nowrap transition-colors ${
+                  category === cat.id
+                    ? 'bg-brown-dark text-cream'
+                    : 'bg-cream text-brown-dark hover:bg-gold/10'
+                }`}
+              >
+                {cat.name}
+              </Link>
+            ))}
+          </div>
 
-        {/* Results */}
-        <div className="flex items-center justify-between mb-6">
-          <p className="text-xs text-brown-light tracking-wider uppercase">
-            {productsResult.count} {productsResult.count === 1 ? 'product' : 'products'}
-          </p>
-          <div className="flex items-center gap-2">
-            <ShopSort currentSort={sort} />
+          <div className="flex items-center justify-between sm:justify-end gap-4">
+            <span className="text-xs text-brown-light whitespace-nowrap">
+              {productsResult.count} {productsResult.count === 1 ? 'item' : 'items'}
+            </span>
+            <ShopSort />
           </div>
         </div>
 
@@ -106,28 +168,41 @@ export default async function ShopPage({ searchParams }: ShopPageProps) {
             {/* Pagination */}
             {productsResult.totalPages > 1 && (
               <div className="flex items-center justify-center gap-2 mt-12">
-                {Array.from({ length: productsResult.totalPages }, (_, i) => i + 1).map((p) => (
-                  <Link
-                    key={p}
-                    href={`/shop?page=${p}${category ? `&category=${category}` : ''}${sort ? `&sort=${sort}` : ''}`}
-                    className={`w-10 h-10 flex items-center justify-center text-sm border transition-colors ${
-                      p === page
-                        ? 'bg-brown-dark text-cream border-brown-dark'
-                        : 'border-border text-brown-dark hover:border-gold hover:text-gold'
-                    }`}
-                  >
-                    {p}
-                  </Link>
-                ))}
+                {Array.from({ length: productsResult.totalPages }, (_, i) => i + 1).map((p) => {
+                  const params = new URLSearchParams();
+                  if (category) params.set('category', category);
+                  if (sort) params.set('sort', sort);
+                  if (filter) params.set('filter', filter);
+                  params.set('page', String(p));
+                  return (
+                    <Link
+                      key={p}
+                      href={`/shop?${params.toString()}`}
+                      className={`w-10 h-10 flex items-center justify-center text-sm border transition-colors ${
+                        p === page
+                          ? 'bg-brown-dark text-cream border-brown-dark'
+                          : 'border-border text-brown-dark hover:border-gold hover:text-gold'
+                      }`}
+                    >
+                      {p}
+                    </Link>
+                  );
+                })}
               </div>
             )}
           </>
         ) : (
           <div className="text-center py-20">
             <p className="font-heading text-xl text-brown-light mb-2">No products found</p>
-            <p className="text-sm text-brown-light/70">
-              Check back soon for new additions to our collection.
+            <p className="text-sm text-brown-light/70 mb-6">
+              Try adjusting your filters or browse all categories.
             </p>
+            <Link
+              href="/shop"
+              className="inline-flex items-center gap-2 bg-brown-dark text-cream px-6 py-3 text-xs tracking-[0.15em] uppercase hover:bg-gold transition-colors"
+            >
+              Clear Filters
+            </Link>
           </div>
         )}
       </div>

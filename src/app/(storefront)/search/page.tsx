@@ -4,8 +4,15 @@ import ProductCard from '@/components/storefront/ProductCard';
 import { Search as SearchIcon } from 'lucide-react';
 
 export const metadata: Metadata = {
-  title: 'Search',
-  description: 'Search our collection of premium women\'s fashion at AIZORA',
+  title: 'Search Collection | AIZORA',
+  description: 'Search our collection of premium women\'s fashion, ethnic wear, and designer outfits at AIZORA (aizorastyle.in).',
+  robots: {
+    index: false,
+    follow: true,
+  },
+  alternates: {
+    canonical: '/search',
+  },
 };
 
 interface SearchPageProps {

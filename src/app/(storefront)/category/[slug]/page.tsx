@@ -12,18 +12,47 @@ interface CategoryPageProps {
   searchParams: Promise<{ page?: string }>;
 }
 
+const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL || 'https://aizorastyle.in';
+
 export async function generateMetadata({ params }: CategoryPageProps): Promise<Metadata> {
   const { slug } = await params;
   const category = await getCategoryBySlug(slug);
   if (!category) return {};
 
+  const title = `${category.name} Collection for Women | AIZORA`;
+  const description =
+    category.description ||
+    `Explore the ${category.name} collection at AIZORA (aizorastyle.in). Premium handcrafted ladies fashion, pure fabrics, and contemporary elegance with Free Pan-India Delivery.`;
+
   return {
-    title: `${category.name} Collection`,
-    description: category.description || `Shop ${category.name} at AIZORA — Premium Women's Fashion`,
+    title,
+    description,
+    keywords: [
+      category.name,
+      `${category.name} women`,
+      `${category.name} online`,
+      'Aizora',
+      'Aizora Style',
+      'best clothing brand for ladies',
+      'women clothing brand India',
+    ],
+    alternates: {
+      canonical: `/category/${category.slug}`,
+    },
     openGraph: {
-      title: `${category.name} Collection | AIZORA`,
-      description: category.description || `Shop ${category.name} at AIZORA`,
-      images: category.image_url ? [{ url: category.image_url }] : [],
+      title,
+      description,
+      url: `${SITE_URL}/category/${category.slug}`,
+      siteName: 'AIZORA',
+      images: category.image_url ? [{ url: category.image_url, alt: category.name }] : [],
+      type: 'website',
+      locale: 'en_IN',
+    },
+    twitter: {
+      card: 'summary_large_image',
+      title,
+      description,
+      images: category.image_url ? [category.image_url] : [],
     },
   };
 }
@@ -43,14 +72,63 @@ export default async function CategoryPage({ params, searchParams }: CategoryPag
     pageSize: 12,
   });
 
+  const categoryUrl = `${SITE_URL}/category/${category.slug}`;
+
+  // Structured Data for Google Collection & Breadcrumbs
+  const categoryJsonLd = {
+    '@context': 'https://schema.org',
+    '@type': 'CollectionPage',
+    name: `${category.name} Collection`,
+    description: category.description || `Shop ${category.name} at AIZORA`,
+    url: categoryUrl,
+    mainEntity: {
+      '@type': 'ItemList',
+      itemListElement: productsResult.data.map((p, idx) => ({
+        '@type': 'ListItem',
+        position: idx + 1,
+        url: `${SITE_URL}/product/${p.slug}`,
+        name: p.name,
+      })),
+    },
+  };
+
+  const breadcrumbsJsonLd = {
+    '@context': 'https://schema.org',
+    '@type': 'BreadcrumbList',
+    itemListElement: [
+      {
+        '@type': 'ListItem',
+        position: 1,
+        name: 'Home',
+        item: SITE_URL,
+      },
+      {
+        '@type': 'ListItem',
+        position: 2,
+        name: category.name,
+        item: categoryUrl,
+      },
+    ],
+  };
+
   return (
     <div className="bg-ivory min-h-screen">
+      {/* Schema.org Structured Data */}
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(categoryJsonLd) }}
+      />
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(breadcrumbsJsonLd) }}
+      />
+
       {/* Breadcrumb */}
       <div className="max-w-7xl mx-auto px-4 lg:px-8 py-4">
-        <nav className="flex items-center gap-2 text-xs text-brown-light">
+        <nav aria-label="Breadcrumb" className="flex items-center gap-2 text-xs text-brown-light">
           <Link href="/" className="hover:text-gold transition-colors">Home</Link>
           <ChevronRight className="w-3 h-3" />
-          <span className="text-brown-dark font-medium">{category.name}</span>
+          <span className="text-brown-dark font-medium" aria-current="page">{category.name}</span>
         </nav>
       </div>
 

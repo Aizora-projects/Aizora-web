@@ -6,9 +6,15 @@ export default function robots(): MetadataRoute.Robots {
       {
         userAgent: '*',
         allow: '/',
-        disallow: ['/admin/', '/api/'],
+        disallow: ['/admin/', '/api/', '/account', '/checkout', '/cart'],
+      },
+      {
+        userAgent: 'Googlebot',
+        allow: '/',
+        disallow: ['/admin/', '/api/', '/account', '/checkout', '/cart'],
       },
     ],
-    sitemap: 'https://aizora.in/sitemap.xml',
+    sitemap: 'https://aizorastyle.in/sitemap.xml',
+    host: 'https://aizorastyle.in',
   };
 }

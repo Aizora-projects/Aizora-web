@@ -104,6 +104,80 @@ export default async function HomePage() {
           )}
         </div>
       </section>
+
+      {/* Editorial Brand SEO Section — High Topical Authority for Google Search */}
+      <section className="py-16 lg:py-20 bg-cream/30 border-t border-border/70">
+        <div className="max-w-7xl mx-auto px-4 lg:px-8">
+          <div className="max-w-4xl mx-auto text-center space-y-4 mb-10">
+            <span className="text-[10px] tracking-[0.25em] uppercase text-tan font-bold">
+              The AIZORA Story
+            </span>
+            <h2 className="font-heading text-2xl sm:text-3xl lg:text-4xl text-brown-dark font-medium leading-tight">
+              AIZORA — The Best Clothing Brand for Modern Women & Ladies Fashion
+            </h2>
+            <div className="w-12 h-0.5 bg-tan/40 mx-auto" />
+          </div>
+
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-8 text-xs sm:text-sm text-brown-light leading-relaxed font-body">
+            <div className="space-y-3 bg-white/70 p-6 rounded-sm border border-border/60">
+              <h3 className="font-heading text-base text-brown-dark font-semibold tracking-wide uppercase">
+                Handcrafted Women&apos;s Ethnic Wear
+              </h3>
+              <p>
+                At <strong>AIZORA (aizorastyle.in)</strong>, we curate premium ladies fashion designed to celebrate feminine grace. From breathable daily-wear cotton suits and regal festive kurtis to intricately embellished celebratory ensembles, every creation reflects timeless Indian artistry blended with contemporary aesthetics.
+              </p>
+            </div>
+
+            <div className="space-y-3 bg-white/70 p-6 rounded-sm border border-border/60">
+              <h3 className="font-heading text-base text-brown-dark font-semibold tracking-wide uppercase">
+                Contemporary Co-ord Sets & Western Styles
+              </h3>
+              <p>
+                Experience effortless chic with our curated range of stylish women&apos;s co-ord sets, vacation wear, and smart western outfits. Designed for the modern woman on the move, our silhouettes offer unmatched comfort, flattering tailored cuts, and premium skin-friendly fabrics.
+              </p>
+            </div>
+
+            <div className="space-y-3 bg-white/70 p-6 rounded-sm border border-border/60">
+              <h3 className="font-heading text-base text-brown-dark font-semibold tracking-wide uppercase">
+                Inclusive Sizing & Pan-India Free Delivery
+              </h3>
+              <p>
+                We believe elegance knows no size. Our dedicated <strong>Plus Size collection</strong> and wide size spectrum ensure every woman finds her ideal fit. Enjoy safe prepaid checkout, personalized WhatsApp customer care, and reliable <strong>Free Pan-India Delivery</strong> directly to your doorstep.
+              </p>
+            </div>
+          </div>
+
+          {/* Keyword Discovery Pills for Crawlers & Shoppers */}
+          <div className="mt-10 pt-8 border-t border-border/50 text-center">
+            <p className="text-[11px] uppercase tracking-[0.16em] text-brown-dark font-semibold mb-3">
+              Explore Popular Curations
+            </p>
+            <div className="flex flex-wrap items-center justify-center gap-2 text-xs">
+              <Link href="/shop" className="px-3 py-1.5 bg-white border border-border/80 rounded-full text-brown-dark hover:border-tan hover:text-tan transition-colors">
+                All Women&apos;s Clothing
+              </Link>
+              <Link href="/category/cotton" className="px-3 py-1.5 bg-white border border-border/80 rounded-full text-brown-dark hover:border-tan hover:text-tan transition-colors">
+                Cotton Kurti Sets
+              </Link>
+              <Link href="/category/ethnic-wear" className="px-3 py-1.5 bg-white border border-border/80 rounded-full text-brown-dark hover:border-tan hover:text-tan transition-colors">
+                Ladies Ethnic Wear
+              </Link>
+              <Link href="/category/co-ord-set" className="px-3 py-1.5 bg-white border border-border/80 rounded-full text-brown-dark hover:border-tan hover:text-tan transition-colors">
+                Designer Co-ord Sets
+              </Link>
+              <Link href="/category/party-wear" className="px-3 py-1.5 bg-white border border-border/80 rounded-full text-brown-dark hover:border-tan hover:text-tan transition-colors">
+                Party Wear Dresses
+              </Link>
+              <Link href="/category/plus-size" className="px-3 py-1.5 bg-white border border-border/80 rounded-full text-brown-dark hover:border-tan hover:text-tan transition-colors">
+                Plus Size Fashion
+              </Link>
+              <Link href="/offers" className="px-3 py-1.5 bg-white border border-border/80 rounded-full text-brown-dark hover:border-tan hover:text-tan transition-colors">
+                Special Offer Items
+              </Link>
+            </div>
+          </div>
+        </div>
+      </section>
     </>
   );
 }

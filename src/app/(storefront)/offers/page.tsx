@@ -7,9 +7,32 @@ import ShopSort from '@/components/storefront/ShopSort';
 
 export const dynamic = 'force-dynamic';
 
+const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL || 'https://aizorastyle.in';
+
 export const metadata: Metadata = {
-  title: 'Offer Items | Special Deals & Exclusive Discounts — AIZORA',
-  description: 'Explore exclusive limited-time offers and special pricing on premium women\'s fashion at AIZORA.',
+  title: 'Exclusive Offers & Discounts on Women\'s Clothing | AIZORA',
+  description:
+    'Discover exclusive limited-time deals on premium ladies ethnic wear, cotton sets, and designer fashion at AIZORA (aizorastyle.in). Luxury styles at special prices with Free Pan-India Delivery.',
+  keywords: [
+    'Aizora Offers',
+    'women clothing sale India',
+    'ethnic wear discounts',
+    'kurtis on sale',
+    'cotton sets offers',
+    'best clothing brand for ladies',
+  ],
+  alternates: {
+    canonical: '/offers',
+  },
+  openGraph: {
+    title: 'Offer Items | Special Deals & Discounts — AIZORA',
+    description:
+      'Explore exclusive limited-time offers and special pricing on premium women\'s fashion at AIZORA.',
+    url: `${SITE_URL}/offers`,
+    siteName: 'AIZORA',
+    type: 'website',
+    locale: 'en_IN',
+  },
 };
 
 interface OffersPageProps {
@@ -29,14 +52,51 @@ export default async function OffersPage({ searchParams }: OffersPageProps) {
     orderDir: sort === 'price-low' ? 'asc' : sort === 'price-high' ? 'desc' : 'desc',
   });
 
+  const offersJsonLd = {
+    '@context': 'https://schema.org',
+    '@type': 'CollectionPage',
+    name: 'Special Offers & Exclusive Discounts on Women\'s Fashion',
+    description: 'Exclusive handpicked styles at special pricing from AIZORA',
+    url: `${SITE_URL}/offers`,
+  };
+
+  const breadcrumbsJsonLd = {
+    '@context': 'https://schema.org',
+    '@type': 'BreadcrumbList',
+    itemListElement: [
+      {
+        '@type': 'ListItem',
+        position: 1,
+        name: 'Home',
+        item: SITE_URL,
+      },
+      {
+        '@type': 'ListItem',
+        position: 2,
+        name: 'Offer Items',
+        item: `${SITE_URL}/offers`,
+      },
+    ],
+  };
+
   return (
     <div className="bg-ivory min-h-screen">
+      {/* Schema.org Structured Data */}
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(offersJsonLd) }}
+      />
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(breadcrumbsJsonLd) }}
+      />
+
       {/* Breadcrumbs */}
       <div className="max-w-7xl mx-auto px-4 lg:px-8 py-4">
-        <nav className="flex items-center gap-2 text-xs text-brown-light font-body">
+        <nav aria-label="Breadcrumb" className="flex items-center gap-2 text-xs text-brown-light font-body">
           <Link href="/" className="hover:text-tan transition-colors">Home</Link>
           <ChevronRight className="w-3.5 h-3.5 stroke-[1.5]" />
-          <span className="text-brown-dark font-medium">Offer Items</span>
+          <span className="text-brown-dark font-medium" aria-current="page">Offer Items</span>
         </nav>
       </div>
 
@@ -62,19 +122,16 @@ export default async function OffersPage({ searchParams }: OffersPageProps) {
         </div>
       </section>
 
-      {/* Main Content Area */}
-      <div className="max-w-7xl mx-auto px-4 lg:px-8 pb-20">
-        {/* Count & Sort Bar */}
-        <div className="flex items-center justify-between border-b border-border/80 pb-4 mb-8">
-          <p className="text-xs text-brown-light tracking-wider uppercase font-medium">
-            Showing {productsResult.count} {productsResult.count === 1 ? 'Special Offer' : 'Special Offers'}
-          </p>
-          <div className="flex items-center gap-2">
-            <ShopSort currentSort={sort} />
-          </div>
+      {/* Offers Products Grid */}
+      <div className="max-w-7xl mx-auto px-4 lg:px-8 pb-16">
+        {/* Control Bar: Items Count + Sort */}
+        <div className="flex items-center justify-between gap-4 mb-8 pb-4 border-b border-border">
+          <span className="text-xs tracking-[0.1em] uppercase text-brown-light font-medium">
+            {productsResult.count} {productsResult.count === 1 ? 'Special Offer Item' : 'Special Offer Items'}
+          </span>
+          <ShopSort />
         </div>
 
-        {/* Product Grid */}
         {productsResult.data.length > 0 ? (
           <>
             <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 md:gap-6 lg:gap-8">
@@ -83,51 +140,47 @@ export default async function OffersPage({ searchParams }: OffersPageProps) {
               ))}
             </div>
 
-            {/* Pagination Controls */}
+            {/* Pagination */}
             {productsResult.totalPages > 1 && (
-              <div className="flex justify-center items-center gap-2 mt-12 pt-8 border-t border-border/80">
-                {page > 1 && (
-                  <Link
-                    href={`/offers?page=${page - 1}${sort ? `&sort=${sort}` : ''}`}
-                    className="px-4 py-2 text-xs tracking-wider uppercase border border-border text-brown-dark hover:border-tan hover:text-tan transition-colors rounded-xs"
-                  >
-                    Previous
-                  </Link>
-                )}
-
-                <span className="text-xs text-brown-light px-4 py-2 font-medium">
-                  Page {page} of {productsResult.totalPages}
-                </span>
-
-                {page < productsResult.totalPages && (
-                  <Link
-                    href={`/offers?page=${page + 1}${sort ? `&sort=${sort}` : ''}`}
-                    className="px-4 py-2 text-xs tracking-wider uppercase border border-border text-brown-dark hover:border-tan hover:text-tan transition-colors rounded-xs"
-                  >
-                    Next
-                  </Link>
-                )}
+              <div className="flex items-center justify-center gap-2 mt-12">
+                {Array.from({ length: productsResult.totalPages }, (_, i) => i + 1).map((p) => {
+                  const params = new URLSearchParams();
+                  if (sort) params.set('sort', sort);
+                  params.set('page', String(p));
+                  return (
+                    <Link
+                      key={p}
+                      href={`/offers?${params.toString()}`}
+                      className={`w-10 h-10 flex items-center justify-center text-sm border transition-colors ${
+                        p === page
+                          ? 'bg-brown-dark text-cream border-brown-dark font-semibold'
+                          : 'border-border text-brown-dark hover:border-tan hover:text-tan'
+                      }`}
+                    >
+                      {p}
+                    </Link>
+                  );
+                })}
               </div>
             )}
           </>
         ) : (
-          /* Empty State */
-          <div className="text-center py-16 sm:py-24 bg-white/60 border border-border/70 rounded-md p-8 sm:p-12">
-            <div className="w-16 h-16 rounded-full bg-cream border border-border flex items-center justify-center mx-auto mb-5 text-tan">
-              <Tag className="w-7 h-7" />
+          <div className="text-center py-20 px-4">
+            <div className="w-14 h-14 rounded-full bg-tan/15 text-tan flex items-center justify-center mx-auto mb-4">
+              <Tag className="w-6 h-6 stroke-[1.5]" />
             </div>
-            <h2 className="font-heading text-xl sm:text-2xl font-semibold uppercase tracking-wider text-brown-dark mb-2">
-              No Offers Currently Active
+            <h2 className="font-heading text-xl sm:text-2xl text-brown-dark mb-2">
+              No Active Offers Right Now
             </h2>
-            <p className="text-sm text-brown-light max-w-md mx-auto mb-8 font-body leading-relaxed">
-              Our curated special deals are refreshed regularly. Check back soon or explore our complete catalog of signature collections.
+            <p className="text-sm text-brown-light/80 max-w-md mx-auto mb-8 font-body leading-relaxed">
+              New limited-time collections and exclusive festival offers are added frequently. Check back soon or explore our complete catalog.
             </p>
             <Link
               href="/shop"
-              className="inline-flex items-center gap-2 bg-brown-dark text-white px-8 py-3.5 text-xs tracking-[0.18em] uppercase font-semibold hover:bg-bronze transition-colors shadow-sm rounded-xs"
+              className="inline-flex items-center gap-2.5 bg-brown-dark hover:bg-black text-white px-7 py-3 text-xs tracking-[0.16em] uppercase font-bold rounded-xs transition-colors shadow-sm"
             >
-              <span>Explore All Collections</span>
-              <ArrowRight className="w-4 h-4" />
+              <span>Explore All Products</span>
+              <ArrowRight className="w-3.5 h-3.5" />
             </Link>
           </div>
         )}
