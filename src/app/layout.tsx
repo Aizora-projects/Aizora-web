@@ -103,6 +103,9 @@ export const metadata: Metadata = {
       'max-snippet': -1,
     },
   },
+  verification: {
+    google: '3RICnFHQV5D66ooFq1fdhXgQAr_4z7UMYXLJ7hROmjw',
+  },
   icons: {
     icon: [
       { url: '/icon.svg', type: 'image/svg+xml' },
@@ -175,6 +178,7 @@ export default function RootLayout({
   return (
     <html lang="en" className={`${playfair.variable} ${plusJakartaSans.variable} ${alexBrush.variable} h-full`} suppressHydrationWarning>
       <head>
+        <meta name="google-site-verification" content="3RICnFHQV5D66ooFq1fdhXgQAr_4z7UMYXLJ7hROmjw" />
         <script
           type="application/ld+json"
           dangerouslySetInnerHTML={{ __html: JSON.stringify(orgAndWebsiteSchema) }}
